@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f2438">
+<title>Green House Log</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+:root{
+  --pri:#0f5c9c; --sb:#0f2438; --ink:#16212b; --muted:#5d7283; --line:#c9d9e8;
+  --soft:color-mix(in srgb,var(--pri) 11%,#fff);
+  --soft2:color-mix(in srgb,var(--pri) 19%,#fff);
+  --page:color-mix(in srgb,var(--pri) 6%,#f5f8fb);
+  --card:#fff; --sbw:260px; --isz:40px; --csz:230px; --overlay:rgba(10,20,30,.5);
+  --t1:#1fae5b; --t2:#0f9fb5; --t3:#2f6fdc;
+}
+:root[data-theme="navy"]{--pri:#0f5c9c;--sb:#0f2438}
+:root[data-theme="sky"]{--pri:#3f9bef;--sb:#121b28}
+:root[data-theme="brown"]{--pri:#7a5c33;--sb:#2a2622}
+:root[data-theme="amber"]{--pri:#e9a02d;--sb:#0b1b2e}
+:root[data-theme="cyan"]{--pri:#1593c4;--sb:#0b3a53}
+:root[data-theme="mix"]{--pri:#7c5cd6;--sb:#1f2a44}
+:root[data-theme="rose"]{--pri:#cc3366;--sb:#4a1530}
+:root[data-theme="green"]{--pri:#2e9e4b;--sb:#0f3a1d}
+:root[data-theme="orange"]{--pri:#f26b0f;--sb:#4a2208}
+:root[data-theme="purple"]{--pri:#6d4adf;--sb:#271f5e}
+
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--page);color:var(--ink);font-family:"Segoe UI","Noto Sans Bengali","Hind Siliguri",system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px}
+.hidden{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{background:var(--soft);border:1.5px solid var(--pri);border-radius:12px;padding:8px 11px;width:100%;min-width:0}
+input[type=file]{background:transparent;border:none;padding:4px 0;width:auto}
+input[type=range]{padding:0;border:none;background:transparent;accent-color:var(--pri)}
+input[type=checkbox]{width:auto;accent-color:var(--pri)}
+input[type=color]{padding:2px;height:40px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid color-mix(in srgb,var(--pri) 55%,#fff);outline-offset:1px}
+button{cursor:pointer}
+a{color:var(--pri)}
+
+/* ---------- buttons ---------- */
+.btn{border:1.5px solid var(--pri);background:#fff;color:var(--pri);border-radius:12px;padding:9px 15px;font-weight:700}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--pri);color:#fff}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.danger{background:#c0392b;border-color:#c0392b;color:#fff}
+.btn.sm{padding:4px 10px;border-radius:9px;font-size:13px}
+.sel.sm{padding:4px 8px;border-radius:9px;width:auto;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* ---------- login ---------- */
+.login{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,var(--sb) 0%,var(--pri) 120%);padding:16px;z-index:30}
+.lcard{background:#fff;border-radius:18px;padding:26px 28px;width:min(430px,100%);box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.ltitle{display:flex;gap:8px;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--pri);margin-bottom:14px}
+.lbl{display:block;color:var(--muted);margin:10px 0 4px}
+.lin{background:#f3f6fa;border-color:#d9e2ec}
+.lpw input{background:#f3f6fa;border-color:#d9e2ec}
+.lbtn{width:100%;margin-top:16px;padding:12px;border:none;border-radius:12px;background:var(--pri);color:#fff;font-weight:800;font-size:17px}
+.lmsg{min-height:20px;margin-top:8px;text-align:center;font-size:13.5px;color:#d13d3d;font-weight:600}
+.lmsg.ok{color:#1f9d55}
+.llinks{text-align:center;line-height:2;margin-top:6px;font-size:14px}
+
+/* ---------- password eye ---------- */
+.pw{position:relative}
+.pw input{padding-right:38px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:transparent;font-size:16px;padding:4px;opacity:.7}
+
+/* ---------- app shell ---------- */
+.app{display:flex;height:100vh;height:100dvh;overflow:hidden}
+.sb{position:relative;width:var(--sbw);flex:none;background:var(--sb);color:#e8f0f7;display:flex;flex-direction:column;z-index:20}
+.app.hide-sb .sb{display:none}
+.sbh{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.12)}
+.sbt{font-weight:800;letter-spacing:.3px;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hidebtn{background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:7px;padding:4px 11px;font-size:14px;font-weight:600}
+.sbnav{flex:1;overflow-y:auto;padding:6px 0}
+.sbi{display:block;width:100%;text-align:left;background:transparent;border:none;color:#f2f7fc;padding:13px 16px;font-size:17px;border-left:4px solid transparent;line-height:1.35;word-break:break-word}
+.sbi:hover{background:rgba(255,255,255,.1)}
+.sbi.on{background:rgba(255,255,255,.24);color:#fff;border-left-color:#fff;font-weight:800}
+.sbi.sbadd{color:#bfe3ff;border-top:1px dashed rgba(255,255,255,.2);margin-top:4px}
+.rz{position:absolute;top:0;right:-4px;width:8px;height:100%;cursor:col-resize;z-index:25;touch-action:none}
+.rz:hover,.rz.drag{background:linear-gradient(90deg,transparent,rgba(120,170,230,.55),transparent)}
+.sbback{display:none}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.hd{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border-bottom:1px solid var(--line);flex:none}
+.hb{width:42px;height:40px;border:1.5px solid var(--pri);border-radius:10px;background:#fff;color:var(--pri);font-size:20px;line-height:1;flex:none}
+.av{position:relative;width:68px;height:68px;border-radius:50%;border:2px dashed var(--line);background:var(--soft);display:grid;place-items:center;font-size:24px;cursor:pointer;flex:none}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:none}
+.av.has img{display:block}.av.has #avEmoji{display:none}
+.pen{position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:50%;background:var(--pri);color:#fff;font-size:10px;font-style:normal;display:grid;place-items:center}
+.pname{position:relative;flex:none;white-space:nowrap;border:1.5px solid var(--pri);border-radius:12px;background:var(--soft);padding:9px 28px 9px 12px;font-weight:800;line-height:1.3}
+.pname::after{content:"▾";position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--pri)}
+.pname select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;padding:0;border:none}
+.hcen{flex:1;min-width:0}
+.hin{width:fit-content;max-width:100%;margin:0 auto;text-align:center}
+.hcen textarea{display:block;margin:0 auto;text-align:center;resize:none;overflow:hidden;width:auto;min-width:4em;max-width:100%;line-height:1.25}
+.chip{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);background:#f1f6fa;border:1px solid var(--line);border-radius:12px;padding:7px 12px;min-width:190px;max-width:300px;line-height:1.3;flex:none;font-weight:700;text-align:left}
+.chip:not(:empty)::before{content:"●";font-size:10px;flex:none}
+.chip.ok{color:#17883f;border-color:#9fd8b5;background:#eefaf2}
+.chip.err{color:#d13030;border-color:#f0b3b3;background:#fdf1f1}
+.scroll{flex:1;overflow:auto;padding:14px 16px 40px}
+.page{max-width:1500px;margin:0 auto}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(15,40,70,.05)}
+.ctitle{font-size:19px;font-weight:800;color:var(--pri);margin-bottom:10px}
+.rowb{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.sub{font-weight:700;color:var(--pri);margin:16px 0 6px}
+.fld label,.sliders label{display:block;font-size:13.5px;font-weight:700;color:var(--pri);margin-bottom:4px}
+.fld{min-width:0}.fld.grow{flex:1 1 260px}
+.g2{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+.rowf{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end}
+.rowf .fld{flex:0 1 220px}
+.rowf .fld.grow{flex:1 1 300px}
+.hint{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.3}
+.msg{min-height:18px;margin-top:8px;font-size:13.5px;color:var(--muted);word-break:break-word}
+.msg.ok{color:#1f9d55;font-weight:700}.msg.err{color:#d13d3d;font-weight:700}
+.chk{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--pri)}
+.infobox{background:var(--soft);border-radius:12px;padding:12px 14px;margin:12px 0;line-height:1.9}
+
+/* ---------- dashboard ---------- */
+.h1in{border:1.5px dashed transparent;background:transparent;font-weight:800;font-size:clamp(16px,1.9vw,25px);padding:2px 8px;border-radius:10px;
+  color:var(--t2);background-image:linear-gradient(90deg,var(--t1),var(--t2),var(--t3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.loc{border:1.5px dashed transparent;background:transparent;font-size:clamp(12px,1.25vw,15px);padding:0 6px;margin-top:1px;border-radius:10px;color:var(--muted);position:relative;left:-14px}
+.h1in:hover,.h1in:focus,.loc:hover,.loc:focus{border-color:var(--pri)}
+.h1in:focus{-webkit-text-fill-color:var(--ink);background:#fff}
+.loc:focus{background:#fff}
+.ghh{align-items:center;margin-bottom:8px}
+.ghh .ctitle{margin:0;font-size:22px}
+.ghr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.panel{background:var(--soft);border:1.5px solid var(--line);border-radius:12px;padding:7px 10px 8px}
+.ptitle{font-weight:800;text-align:center;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--line);color:var(--pri)}
+.pair{display:grid;grid-template-columns:44px 1fr;gap:8px;margin-bottom:5px;align-items:center}
+.pair input{padding:4px 10px}
+.pair label.plain{border:none;background:transparent;padding:0;font-size:15px}
+.pair:has(.plain){grid-template-columns:46px 1fr}
+.pair label{font-weight:800;text-align:center;border:1.5px solid var(--pri);border-radius:10px;padding:4px 0;background:#fff;color:var(--pri)}
+.real{font-weight:800;font-size:17px;text-align:center;background:#fff}
+#convF,#convC,.spin{text-align:center;font-weight:700;font-size:16px;background:#fff}
+.sp-label{text-align:center;font-weight:700;margin:4px 0}
+.badge{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--muted)}
+.dot{width:13px;height:13px;border-radius:50%;background:#d93a3a;box-shadow:0 0 0 3px rgba(217,58,58,.2)}
+.badge.on .dot{background:#22b45a;box-shadow:0 0 0 3px rgba(34,180,90,.25)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.lu{display:flex;align-items:center;gap:10px}
+.datebox{position:relative;width:170px}
+.datebox .show{display:block;border:1.5px solid var(--pri);border-radius:12px;background:var(--soft);padding:8px 10px;text-align:center;font-weight:700}
+.datebox input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.add{background:var(--pri);color:#fff;border:none;border-radius:12px;padding:9px 22px;font-weight:800}
+.tablewrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--line);background:#fff}
+table{border-collapse:collapse;width:100%;min-width:1080px}
+thead th{background:var(--pri);color:#fff;padding:9px 6px;font-weight:700;text-align:center;white-space:nowrap;line-height:1.25}
+thead .sub{display:flex;justify-content:space-around;font-weight:600;margin:2px 0 0;color:#fff}
+tbody td{padding:6px 5px;text-align:center;vertical-align:middle;border-top:1px solid var(--line)}
+tbody tr:nth-child(odd) td{background:#fff}
+tbody tr:nth-child(even) td{background:var(--soft)}
+td.sn{width:44px;font-weight:700}
+td.name{min-width:190px}
+td.name select{margin-top:4px;padding:3px 6px;font-size:13px;border-radius:8px}
+td.num input{min-width:62px;text-align:center;border-radius:9px}
+td.fc{min-width:92px}
+td.fc label{display:grid;grid-template-columns:16px 1fr;align-items:center;gap:3px;font-weight:700;font-size:13px;margin:2px 0}
+td.fc input{padding:4px 5px;text-align:center;border-radius:8px}
+td.del{width:40px;background:#fff!important;border-top:none!important}
+.pill{display:inline-block;min-width:52px;padding:5px 10px;border-radius:20px;font-weight:800;font-size:13px;background:#c9d2d8;color:#33434f}
+.pill.on{background:#22b45a;color:#fff}
+td.note{min-width:130px;max-width:170px;cursor:pointer}
+.npv{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;margin:0 auto;text-align:left;padding:6px 8px;border:1.5px solid var(--pri);border-radius:9px;background:var(--soft)}
+.npv.empty{color:var(--muted)}
+td.photo{min-width:110px}
+.pc{display:flex;align-items:center;justify-content:center;gap:6px}
+.pc .th{position:relative}
+.pc img{width:46px;height:46px;object-fit:cover;border-radius:7px;border:1.5px solid var(--pri);cursor:zoom-in;display:block;background:var(--soft)}
+.cnt{position:absolute;right:-6px;top:-6px;background:var(--pri);color:#fff;border-radius:10px;font-size:11px;font-weight:800;padding:1px 6px}
+.mini{border:1.5px solid var(--pri);border-radius:8px;background:#fff;padding:4px 9px;font-weight:800;color:var(--pri)}
+.trash{border:none;background:transparent;color:#c0555c;padding:6px;border-radius:6px;display:grid;place-items:center}
+.trash:hover{background:rgba(192,85,92,.15)}
+.trash svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.empty-msg{padding:22px;text-align:center;color:var(--muted)}
+
+/* ---------- settings ---------- */
+.themerow{display:flex;flex-wrap:wrap;gap:12px}
+.thm{width:48px;height:48px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #cfd8e1;padding:0}
+.thm.sel{box-shadow:0 0 0 3px var(--ink)}
+input.bold{font-weight:800;font-size:17px;color:var(--ink);border-width:2px}
+.pfinfo{font-size:14px;font-weight:600;color:var(--muted);margin-left:6px}
+.pfph{display:flex;align-items:center;gap:8px}
+.pfph img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--pri);background:var(--soft)}
+.pfph img:not([src]){visibility:hidden}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.ltile{border-radius:12px;padding:9px 11px 11px;border-left:5px solid var(--c)}
+.ltile small{display:block;font-weight:700;color:var(--c);margin-bottom:5px;font-size:13px}
+.ltile input{background:#fff;border-color:var(--c);border-radius:10px;font-weight:600}
+
+/* ---------- notepad ---------- */
+.nfilters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:10px 0}
+.nfilters .fld{flex:0 1 170px}.nfilters .fld.grow{flex:1 1 260px}
+.sliders{display:flex;flex-wrap:wrap;gap:30px;margin:8px 0 12px}
+.sliders input{width:200px}
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--csz),1fr));gap:14px;background:var(--soft);border-radius:12px;padding:14px;min-height:140px;align-content:start}
+.ncard{position:relative;border-radius:10px;padding:12px 12px 14px;box-shadow:0 2px 6px rgba(0,0,0,.18);cursor:pointer;min-width:0}
+.ncard .ic{position:absolute;right:8px;top:6px;display:flex;gap:6px}
+.ncard .ic button{border:none;background:transparent;font-size:15px;padding:0;opacity:.75}
+.ncard .ic button:hover{opacity:1}
+.ncard .ln{font-size:14px;margin-bottom:3px;padding-right:44px;word-break:break-word}
+.ncard .tl{display:block;width:max-content;max-width:100%;background:#ffe03a;padding:1px 6px;border-radius:3px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2px 0 8px}
+.nth{position:relative;width:var(--isz);height:var(--isz)}
+.nth img{width:100%;height:100%;object-fit:cover;border-radius:8px;border:1.5px solid rgba(0,0,0,.35);cursor:zoom-in;background:rgba(255,255,255,.4)}
+.nth .cnt{background:#222}
+
+/* ---------- modals ---------- */
+.overlay{position:fixed;inset:0;background:var(--overlay);display:none;align-items:center;justify-content:center;padding:14px;z-index:50}
+.overlay.open{display:flex}
+.modal{background:#fff;color:var(--ink);border:1.5px solid var(--pri);border-radius:14px;width:min(560px,100%);max-height:92vh;overflow:auto;padding:14px 18px 18px;position:relative}
+.modal.sm{width:min(470px,100%)}
+.modal.wide{width:min(860px,100%)}
+.mh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-4px 0 10px;cursor:move;user-select:none;touch-action:none}
+.mh h2{margin:0;font-size:19px;color:var(--pri)}
+.mx{border:none;background:transparent;font-size:20px;color:var(--muted);padding:2px 6px;cursor:pointer}
+.modal .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.modal .fld{margin-top:8px}
+.ta{min-height:200px;resize:vertical;border-radius:12px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-top:12px}
+.nphbox{flex:1;min-height:20px}
+.pgrid .it{position:relative}
+.pgrid img{width:100%;height:96px;object-fit:cover;border-radius:8px;border:1.5px solid var(--pri);background:var(--soft)}
+.pgrid .x{position:absolute;top:-7px;right:-7px;width:24px;height:24px;border-radius:50%;border:none;background:#d13d3d;color:#fff;font-weight:800;line-height:1}
+.nhead{display:flex;gap:10px;flex-wrap:wrap}
+.nhead .fld{margin-top:0;flex:0 1 auto}.nhead .fld.grow{flex:1 1 220px}
+.palrow{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:9px;font-size:13.5px;color:var(--muted)}
+.pal{display:inline-flex;gap:6px;flex-wrap:wrap}
+.sw{width:22px;height:22px;border-radius:50%;border:2px solid #9aa7b2;padding:0}
+.sw.sel{border-color:#000;box-shadow:0 0 0 2px #fff inset}
+.tools{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;align-items:center}
+.ed{min-height:230px;max-height:42vh;overflow:auto;margin-top:10px;border:1.5px solid var(--line);border-radius:12px;padding:12px;background:#fff;line-height:1.6;outline:none}
+.ed:focus{border-color:var(--pri)}
+.ed ul,.ed ol{margin:4px 0;padding-left:26px}
+.ed .tk{display:flex;gap:8px;align-items:flex-start}
+.ed .tk input{width:auto;margin-top:6px}
+.nph{display:flex;align-items:center;gap:12px;margin-top:10px}
+.nph .btn{display:inline-block;cursor:pointer}
+.reccode{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:26px;font-weight:800;letter-spacing:2px;text-align:center;background:var(--soft);border:2px dashed var(--pri);border-radius:12px;padding:16px 8px;user-select:all}
+.lb{background:rgba(0,0,0,.88);flex-direction:column;gap:12px;z-index:60}
+.lb img{max-width:96vw;max-height:78vh;object-fit:contain;border-radius:8px;cursor:pointer}
+.lb .ctl{display:flex;gap:10px;align-items:center;color:#fff;flex-wrap:wrap;justify-content:center}
+.lb .btn{background:#1f2a33;color:#fff;border-color:#5b6f7e}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1d2b35;color:#fff;padding:10px 18px;border-radius:10px;z-index:99;opacity:0;pointer-events:none;transition:opacity .2s;max-width:92vw;text-align:center}
+.toast.show{opacity:1}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .trio{grid-template-columns:1fr 1fr}
+  .trio .panel:last-child{grid-column:1/-1}
+}
+@media (max-width:820px){
+  .sb{position:fixed;left:0;top:0;bottom:0;width:min(var(--sbw),82vw);transform:translateX(-100%);transition:transform .2s;box-shadow:4px 0 18px rgba(0,0,0,.3)}
+  .app.hide-sb .sb{display:flex}
+  .app.sbopen .sb{transform:none}
+  .app.sbopen .sbback{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:15}
+  .rz{display:none}
+  .hd{gap:7px;padding:8px 9px}
+  .hd{flex-wrap:wrap}
+  .av{width:54px;height:54px}
+  .pname{max-width:150px;padding:7px 24px 7px 9px;font-size:14px}
+  .hcen{order:5;flex:1 1 100%}
+  .chip{font-size:11.5px;margin-left:auto;width:auto;max-width:60vw}
+  .loc{left:0}
+  .scroll{padding:10px 9px 40px}
+  .g2{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .trio{grid-template-columns:1fr}
+  .card{padding:13px 12px}
+}
+
+#pfName{font-size:17px;font-weight:700;padding:12px 14px}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login" class="login hidden">
+  <div class="lcard">
+    <div class="ltitle"><span>🔐</span> <span id="lgTitle">Green House Log</span></div>
+    <label class="lbl">প্রোফাইল</label>
+    <select id="lgSel" class="lin"></select>
+    <label class="lbl">PIN</label>
+    <div class="pw lpw"><input id="lgPin" type="password" inputmode="numeric" autocomplete="off"><button type="button" class="eye" tabindex="-1">👁</button></div>
+    <button id="lgGo" class="lbtn">ঢুকুন</button>
+    <div class="lmsg" id="lgMsg"></div>
+    <div class="llinks">
+      <a href="#" id="lkForgot">PIN ভুলে গেছেন?</a> · <a href="#" id="lkNew">+ নতুন প্রোফাইল</a><br>
+      <a href="#" id="lkMembers">🔄 সদস্য তালিকা আনুন</a> · <a href="#" id="lkGoogle">🔗 Google সংযোগ</a>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app" class="app hidden">
+  <aside id="sb" class="sb">
+    <div class="sbh"><span class="sbt">📊 NAVIGATION</span><button id="sbHide" class="hidebtn">Hide</button></div>
+    <nav id="sbnav" class="sbnav"></nav>
+    <div id="sbrz" class="rz" title="টেনে চওড়া/সরু করুন"></div>
+  </aside>
+  <div id="sbback" class="sbback"></div>
+
+  <div class="main">
+    <header class="hd">
+      <button id="hamb" class="hb" aria-label="Menu">☰</button>
+      <div id="av" class="av" title="প্রোফাইল সেটিংস"><img id="avImg" alt=""><span id="avEmoji">🧑</span><i class="pen">✎</i></div>
+      <div class="pname"><span id="pnText"></span><select id="profSel" aria-label="Profile"></select></div>
+      <div class="hcen"><div class="hin">
+        <textarea id="dashTitle" class="h1in" rows="1" spellcheck="false" aria-label="Dashboard title"></textarea>
+        <textarea id="locName" class="loc" rows="1" spellcheck="false" aria-label="Location name"></textarea>
+      </div></div>
+      <div id="syncChip" class="chip"></div>
+    </header>
+
+    <div class="scroll">
+
+      <!-- ===== Dashboard ===== -->
+      <section id="pDash" class="page">
+        <div class="card">
+          <div class="rowb ghh">
+            <div class="ctitle" id="dashCardTitle"></div>
+            <div class="ghr"><div id="onlineBadge" class="badge"><span class="dot"></span><span id="onlineText">অফলাইন</span></div>
+            <button id="bDelCard" class="btn danger sm" title="এই কার্ড মুছুন">🗑 কার্ড মুছুন</button></div>
+          </div>
+          <div class="trio">
+            <section class="panel">
+              <div class="ptitle">Real Temperature</div>
+              <div class="pair"><label>F</label><input id="realF" class="real" readonly aria-label="Real temperature F"></div>
+              <div class="pair"><label>C</label><input id="realC" class="real" readonly aria-label="Real temperature C"></div>
+            </section>
+            <section class="panel">
+              <div class="ptitle">Temperature Converter</div>
+              <div class="pair"><label>F</label><input id="convF" inputmode="decimal" autocomplete="off"></div>
+              <div class="pair"><label>C</label><input id="convC" inputmode="decimal" autocomplete="off"></div>
+            </section>
+            <section class="panel">
+              <div class="ptitle">Set Point</div>
+              <div class="pair"><label class="plain">Heat</label><input id="heat" class="spin" inputmode="decimal" autocomplete="off" aria-label="Heat set point (F)"></div>
+              <div class="pair"><label class="plain">Cool</label><input id="cool" class="spin" inputmode="decimal" autocomplete="off" aria-label="Cool set point (F)"></div>
+              <div class="hint">মান °F এ লিখুন</div>
+            </section>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="bar">
+            <div class="lu">
+              <b>Last UpDate</b>
+              <div class="datebox"><span id="dateText" class="show"></span><input type="date" id="dateInput" aria-label="Last update date"></div>
+            </div>
+            <button id="btnAdd" class="add">+Add</button>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.N</th><th>Relay Name &amp; No</th><th>Set<br>Point</th><th>Set<br>ON</th><th>Set<br>OFF</th>
+                  <th>Relay ON<div class="sub"><span>F</span><span>C</span></div></th>
+                  <th>Relay OFF<div class="sub"><span>F</span><span>C</span></div></th>
+                  <th>Status</th><th>Note</th><th>Photo</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+            <div id="emptyMsg" class="empty-msg" style="display:none">কোনো রো নেই — +Add চাপুন</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Notepad ===== -->
+      <section id="pNotes" class="page hidden">
+        <div class="card">
+          <div class="rowb ghh">
+            <div class="ctitle" id="notesCardTitle">📝 Notepad</div>
+            <div class="ghr"><button id="nAdd" class="btn primary">+ নতুন এন্ট্রি</button></div>
+          </div>
+          <div class="nfilters">
+            <div class="fld grow"><label>🔍 খুঁজুন (টাইটেল বা নোটের লেখা)</label><input id="nSearch" placeholder="যা খুঁজতে চান লিখুন…" autocomplete="off"></div>
+            <div class="fld"><label>তারিখ থেকে</label><input type="date" id="nFrom"></div>
+            <div class="fld"><label>পর্যন্ত</label><input type="date" id="nTo"></div>
+            <button id="nClear" class="btn">✕ ক্লিয়ার</button>
+          </div>
+          <div class="sliders">
+            <div><label>আইকনের মাপ</label><input type="range" id="nIsz" min="24" max="120" step="2"></div>
+            <div><label>কার্ডের মাপ</label><input type="range" id="nCsz" min="170" max="380" step="5"></div>
+          </div>
+          <div id="nGrid" class="ngrid"></div>
+        </div>
+      </section>
+
+      <!-- ===== Settings ===== -->
+      <section id="pSet" class="page hidden">
+        <div class="card"><div class="rowb ghh"><div class="ctitle" id="setCardTitle">⚙️ Settings &amp; Backup</div><div class="ghr"></div></div></div>
+
+        <div class="card">
+          <div class="ctitle">🧑 প্রোফাইল <span id="pfInfo" class="pfinfo"></span></div>
+          <div class="rowf">
+            <div class="fld" style="flex:0 1 360px"><label>নাম</label><input id="pfName" autocomplete="off"></div>
+            <div class="fld" style="flex:0 1 auto"><label>ছবি</label><div class="pfph"><img id="pfImg" alt=""><input type="file" id="pfPhoto" accept="image/*"></div></div>
+            <div class="fld" style="flex:0 1 165px"><label>জন্মতারিখ</label><input type="date" id="pfDob"></div>
+            <button id="bPfSave" class="btn primary">💾 Save</button>
+          </div>
+          <div class="sub">🔑 PIN</div>
+          <div class="rowf">
+            <div class="fld"><label>বর্তমান PIN</label><div class="pw"><input id="pfCur" type="password" inputmode="numeric" autocomplete="off"><button type="button" class="eye" tabindex="-1">👁</button></div></div>
+            <div class="fld"><label>নতুন PIN</label><div class="pw"><input id="pfNew" type="password" inputmode="numeric" autocomplete="off"><button type="button" class="eye" tabindex="-1">👁</button></div></div>
+            <button id="bPinChange" class="btn">PIN বদলান</button>
+            <button id="bNewRec" class="btn">🗝 নতুন রিকভারি কোড</button>
+          </div>
+          <div class="sub">নতুন সদস্য যোগ</div>
+          <div class="rowf">
+            <div class="fld"><label>নাম</label><input id="nmName" autocomplete="off"></div>
+            <div class="fld"><label>PIN</label><div class="pw"><input id="nmPin" type="password" inputmode="numeric" autocomplete="off"><button type="button" class="eye" tabindex="-1">👁</button></div></div>
+            <button id="bAddMember" class="btn">সদস্য যোগ করুন</button>
+            <button id="bDelProf" class="btn danger">এই প্রোফাইল মুছুন</button>
+            <button id="bSignOut" class="btn">⏻ সাইন আউট</button>
+          </div>
+          <div class="msg" id="msgProf"></div>
+          <div class="hint">প্রতিটি প্রোফাইলের ডাটা আলাদা — একজন অন্যজনের ডাটা দেখতে পায় না।</div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">🎨 থিম</div>
+          <div id="themeRow" class="themerow"></div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">✏️ সাইডবার ও কার্ডের নাম</div>
+          <div class="hint" style="margin:0 0 10px">এখানে বদলালে সাইডবার ও কার্ডের শিরোনাম একসাথে বদলে যায়। সাইডবারের ডান কিনারায় মাউস নিয়ে টেনে চওড়া/সরু করা যায়, ☰ বাটনে লুকানো যায়।</div>
+          <div id="labelGrid" class="lgrid"></div>
+          <button id="bLabelDef" class="btn" style="margin-top:12px">↺ নাম ডিফল্ট করুন</button>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">☁ Google Sheet / Drive</div>
+          <div class="rowf">
+            <div class="fld"><label>ড্রাইভ ফোল্ডারের নাম (সব প্রোফাইলের জন্য একই)</label><input id="sFolder" class="bold" placeholder="যেমন: GreenHouse Log" autocomplete="off"></div>
+            <div class="fld grow"><label>Apps Script ওয়েব অ্যাপ URL</label><input id="sUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off"></div>
+          </div>
+          <div class="hint" id="pathHint"></div>
+          <div class="rowf" style="margin-top:8px">
+            <button id="bGSave" class="btn primary">সেটিং সংরক্ষণ</button>
+            <button id="bSyncNow" class="btn">🔄 এখনই সিঙ্ক (পাঠান ও আনুন)</button>
+            <button id="bPullNew" class="btn">⬇ শুধু নতুন ডাটা আনুন</button>
+            <button id="bTest" class="btn">🔌 টেস্ট কানেকশন</button>
+          </div>
+          <div class="msg" id="msgG"></div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">📅 তারিখের ফরমেট</div>
+          <div class="fld" style="max-width:300px"><label>পুরো ড্যাশবোর্ডে এই ফরমেটে তারিখ দেখাবে</label>
+            <select id="sDate">
+              <option value="d M Y">20 Oct 2026</option>
+              <option value="d F Y">20 October 2026</option>
+              <option value="d/m/Y">20/10/2026</option>
+              <option value="m/d/Y">10/20/2026</option>
+              <option value="Y-m-d">2026-10-20</option>
+            </select></div>
+          <div style="margin-top:8px"><b>আজ: <span id="todayShow"></span></b></div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">📱 অ্যাপের নাম ও আইকন</div>
+          <div class="rowf">
+            <div class="fld grow"><label>অ্যাপের নাম (পুরো)</label><input id="aName" autocomplete="off"></div>
+            <div class="fld grow"><label>হোম স্ক্রিনে নাম (ছোট)</label><input id="aShort" autocomplete="off"></div>
+            <div class="fld" style="max-width:150px"><label>আইকনের চিহ্ন (ইমোজি/১-২ অক্ষর)</label><input id="aIcon" maxlength="4" autocomplete="off"></div>
+            <div class="fld" style="max-width:110px"><label>আইকনের রং</label><input id="aColor" type="color"></div>
+            <div class="fld"><label>অথবা নিজের ছবি</label><input id="aImg" type="file" accept="image/*"></div>
+          </div>
+          <div class="rowf" style="margin-top:8px">
+            <button id="bApply" class="btn primary">প্রয়োগ করুন</button>
+            <button id="bDlApp" class="btn">⬇ ফাইল ডাউনলোড (GitHub-এর জন্য)</button>
+            <button id="bAppDef" class="btn">ডিফল্ট</button>
+          </div>
+          <div class="hint">GitHub Pages-এ HTML ফাইলটি <b>index.html</b> নামে আপলোড করুন, সাথে manifest.webmanifest, icon-192.png, icon-512.png ও sw.js একই ফোল্ডারে দিন। নাম/আইকন বদলালে ফাইল আবার ডাউনলোড করে আপলোড করুন, তারপর ফোনে অ্যাপ মুছে আবার ইনস্টল করুন।</div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">🔄 সিঙ্ক নিয়ন্ত্রণ ও অফলাইন</div>
+          <label class="chk"><input type="checkbox" id="sAuto"> অটো সিঙ্ক চালু (বন্ধ থাকলে শুধু "এখনই সিঙ্ক" বাটনে সিঙ্ক হবে)</label>
+          <div class="fld" style="max-width:300px;margin-top:10px"><label>কোন নেটওয়ার্কে অটো সিঙ্ক হবে</label>
+            <select id="sNet"><option value="any">যেকোনো নেটওয়ার্কে</option><option value="wifi">শুধু Wi-Fi এ</option></select></div>
+          <div id="netBox" class="infobox"></div>
+          <div class="rowf">
+            <button id="bInstall" class="btn">📲 অ্যাপ হিসেবে ইনস্টল করুন</button>
+            <button id="bPersist" class="btn">💾 স্থায়ী স্টোরেজের অনুরোধ</button>
+            <button id="bStatus" class="btn">🔄 অবস্থা দেখুন</button>
+          </div>
+          <div class="msg" id="msgNet"></div>
+          <div class="sub">টেস্ট মোড (ব্রাউজারে যাচাইয়ের জন্য)</div>
+          <label class="chk"><input type="checkbox" id="tOnline"> ড্যাশবোর্ড অনলাইন ধরুন</label>
+          <div class="fld" style="max-width:300px;margin-top:8px"><label id="tTempLabel">Real Temperature (°F)</label><input id="tTemp" inputmode="decimal" placeholder="যেমন: 86" autocomplete="off">
+            <div class="hint">আসল ডিভাইস যুক্ত হলে এই অংশ আর লাগবে না।</div></div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">🗂 JSON ব্যাকআপ</div>
+          <div class="rowf">
+            <button id="bBackup" class="btn primary">⬇ ব্যাকআপ ডাউনলোড</button>
+            <div class="fld"><label>ব্যাকআপ ফাইল বাছুন</label><input type="file" id="fRestore" accept=".json,application/json"></div>
+            <button id="bRestore" class="btn">♻ রিস্টোর করুন</button>
+          </div>
+          <div class="msg" id="msgBackup"></div>
+        </div>
+      </section>
+
+    </div><!-- /scroll -->
+  </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- row photos -->
+<div class="overlay" id="mPhoto">
+  <div class="modal sm">
+    <div class="mh"><h2>📷 Photo</h2><button class="mx" data-close="mPhoto">✕</button></div>
+    <input type="file" id="photoFile" accept="image/*" multiple>
+    <div class="hint">একসাথে একাধিক ছবি বাছাই করা যাবে। ছবি ছোট করে সেভ হবে।</div>
+    <div class="pgrid" id="pgrid"></div>
+    <div class="row"><button class="btn primary" id="photoSave">Save</button><button class="btn" data-close="mPhoto">Cancel</button></div>
+  </div>
+</div>
+
+<!-- row note -->
+<div class="overlay" id="mRowNote">
+  <div class="modal sm">
+    <div class="mh"><h2>Note</h2><button class="mx" data-close="mRowNote">✕</button></div>
+    <textarea id="noteText" class="ta" placeholder="এখানে নোট লিখুন..."></textarea>
+    <div class="row"><button class="btn primary" id="noteSave">Save</button><button class="btn" data-close="mRowNote">Cancel</button></div>
+  </div>
+</div>
+
+<!-- notepad editor -->
+<div class="overlay" id="mNote">
+  <div class="modal wide">
+    <div class="mh"><h2>📝 <span id="nmTitle">নতুন নোট</span></h2><button class="mx" data-close="mNote">✕</button></div>
+    <div class="nhead">
+      <div class="fld" style="max-width:90px"><label>নম্বর</label><input id="nNo" inputmode="numeric"></div>
+      <div class="fld" style="max-width:170px"><label>তারিখ</label><input type="date" id="nDate"></div>
+      <div class="fld grow"><label>টাইটেল</label><input id="nTitle" autocomplete="off"></div>
+    </div>
+    <div class="palrow"><span>টাইটেল রং:</span><span id="palT" class="pal"></span><span>কার্ডের রং:</span><span id="palC" class="pal"></span></div>
+    <div class="palrow"><span>লেখার রং:</span><span id="palX" class="pal"></span><button class="btn sm" id="xClr">✕ লেখার রং মুছুন</button><span>মার্ক:</span><span id="palM" class="pal"></span><button class="btn sm" id="mClr">✕ মার্ক মুছুন</button></div>
+    <div class="tools" id="tools">
+      <button data-cmd="bold" class="btn sm"><b>B</b></button>
+      <button data-cmd="underline" class="btn sm"><u>U</u></button>
+      <select id="fsz" class="sel sm"><option value="">মাপ</option><option value="2">ছোট</option><option value="3">সাধারণ</option><option value="5">বড়</option><option value="6">অনেক বড়</option><option value="7">বিশাল</option></select>
+      <button data-cmd="tick" class="btn sm">☐ টিক-লাইন</button>
+      <button data-cmd="disc" class="btn sm">● গোল</button>
+      <button data-cmd="square" class="btn sm">■ চৌকো</button>
+      <button data-cmd="num" class="btn sm">1. নম্বর</button>
+    </div>
+    <div id="nEd" class="ed" contenteditable="true" spellcheck="false"></div>
+    <div class="nph"><div id="nPhotos" class="nphbox"></div><label class="btn sm">📷 ফটো যোগ করুন<input type="file" id="nPhotoFile" accept="image/*" multiple hidden></label></div>
+    <div class="row">
+      <button class="btn primary" id="nSave">💾 সংরক্ষণ</button>
+      <button class="btn danger" id="nDel">🗑 ডিলিট</button>
+      <button class="btn danger" id="nWipe">নোটটি মুছুন</button>
+      <button class="btn" data-close="mNote">বন্ধ</button>
+    </div>
+  </div>
+</div>
+
+<!-- new profile -->
+<div class="overlay" id="mNew">
+  <div class="modal sm">
+    <div class="mh"><h2>+ নতুন প্রোফাইল</h2><button class="mx" data-close="mNew">✕</button></div>
+    <div class="fld"><label>নাম</label><input id="npName" autocomplete="off"></div>
+    <div class="fld"><label>PIN (কমপক্ষে ৪ ঘর)</label><div class="pw"><input id="npPin" type="password" inputmode="numeric" autocomplete="off"><button type="button" class="eye" tabindex="-1">👁</button></div></div>
+    <div class="fld"><label>PIN আবার দিন</label><div class="pw"><input id="npPin2" type="password" inputmode="numeric" autocomplete="off"><button type="button" class="eye" tabindex="-1">👁</button></div></div>
+    <div class="msg err" id="npMsg"></div>
+    <div class="row"><button class="btn primary" id="npGo">তৈরি করুন</button><button class="btn" data-close="mNew">বাতিল</button></div>
+  </div>
+</div>
+
+<!-- recovery code -->
+<div class="overlay" id="mRec">
+  <div class="modal sm">
+    <div class="mh"><h2>🗝 রিকভারি কোড</h2><button class="mx" id="recX">✕</button></div>
+    <div class="hint" style="margin:0 0 8px">PIN ভুলে গেলে এই কোড দিয়ে নতুন PIN সেট করতে পারবেন। কোডটি কপি করে নিরাপদ জায়গায় রাখুন — পরে আর দেখা যাবে না।</div>
+    <div id="recCode" class="reccode"></div>
+    <div class="row"><button class="btn" id="recCopy">📋 কপি করুন</button></div>
+    <label class="chk" style="margin-top:10px"><input type="checkbox" id="recOk"> আমি কোডটি কপি করে রেখেছি</label>
+    <div class="row"><button class="btn primary" id="recDone" disabled>ঠিক আছে</button></div>
+  </div>
+</div>
+
+<!-- forgot PIN -->
+<div class="overlay" id="mForgot">
+  <div class="modal sm">
+    <div class="mh"><h2>PIN ভুলে গেছেন?</h2><button class="mx" data-close="mForgot">✕</button></div>
+    <div class="fld"><label>প্রোফাইল</label><select id="fgSel"></select></div>
+    <div class="fld"><label>রিকভারি কোড</label><input id="fgCode" placeholder="XXXX-XXXX-XXXX" autocomplete="off"></div>
+    <div class="fld"><label>নতুন PIN</label><div class="pw"><input id="fgPin" type="password" inputmode="numeric" autocomplete="off"><button type="button" class="eye" tabindex="-1">👁</button></div></div>
+    <div class="msg err" id="fgMsg"></div>
+    <div class="row"><button class="btn primary" id="fgGo">PIN রিসেট করুন</button><button class="btn" data-close="mForgot">বাতিল</button></div>
+  </div>
+</div>
+
+<!-- google connect (login) -->
+<div class="overlay" id="mGoogle">
+  <div class="modal sm">
+    <div class="mh"><h2>🔗 Google সংযোগ</h2><button class="mx" data-close="mGoogle">✕</button></div>
+    <div class="fld"><label>Apps Script ওয়েব অ্যাপ URL</label><input id="gUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off"></div>
+    <div class="fld"><label>ড্রাইভ ফোল্ডারের নাম (ফাঁকা রাখলে সার্ভারে যা আছে সেটি)</label><input id="gFolder" autocomplete="off"></div>
+    <div class="msg" id="gMsg"></div>
+    <div class="row"><button class="btn primary" id="gSave">Save</button><button class="btn" id="gTest">Connection Test</button><button class="btn" data-close="mGoogle">বন্ধ</button></div>
+  </div>
+</div>
+
+<!-- lightbox -->
+<div class="overlay lb" id="mLb">
+  <img id="lbImg" alt="Photo">
+  <div class="ctl">
+    <button class="btn" id="lbPrev">‹ আগের</button>
+    <span id="lbCount"></span>
+    <button class="btn" id="lbNext">পরের ›</button>
+    <button class="btn" id="lbEdit">যোগ / মুছুন</button>
+    <button class="btn" id="lbDel">🗑 এই ছবি মুছুন</button>
+    <button class="btn" id="lbClose">Close</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   Green House Log — app.js
+   ===================================================================== */
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var MONF=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var GK='ghApp3',PK='ghp:';
+function jget(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v;}catch(e){return d;}}
+function wait(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function now(){return Date.now();}
+
+/* ---------- device-level state ---------- */
+var G=Object.assign({url:'',folder:'',profiles:[],last:'',sbw:260,sbHide:false,auto:true,net:'any',testOnline:false,isz:40,csz:230,appImg:'',appName:'Green House Log'},jget(GK,{}));
+if((G.v||0)<2){G.v=2;G.isz=40;G.sbw=Math.max(G.sbw||0,260);}
+function gsave(){try{localStorage.setItem(GK,JSON.stringify(G));}catch(e){}}
+
+/* ---------- per-profile state ---------- */
+var P=null,D=null,M=null,page='dash',activeId='';
+
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function defCfg(){return {theme:'navy',labels:{},dashTitle:'Green House Temperature Control Log',dateFmt:'d M Y',appName:'Green House Log',short:'GH Log',icon:'🌿',iconColor:'#0f5c9c',u:0};}
+function newGH(i){return {id:'g'+(i||1),o:i||1,title:'',name:'Nursery',lastUpdate:todayStr(),heat:'',cool:'',testTemp:'',rows:[],del:{},su:0};}
+function newData(){return {gh:[1,2,3,4].map(function(i){return newGH(i);}),notes:[],ndel:{},gdel:{},cfg:defCfg()};}
+function uid(){return 'x'+now().toString(36)+Math.random().toString(36).slice(2,7);}
+function newId(){return now()+String(1000+Math.floor(Math.random()*1000)).slice(1);}
+
+function toPhoto(x){
+  if(x&&typeof x==='object'&&x.k){if(x.d){pPut(x.k,x.d);}return {k:x.k,id:x.id||''};}
+  if(typeof x==='string'){
+    var k=uid();
+    if(/^data:/.test(x)){PC[k]=x;pPut(k,x);return {k:k,id:''};}
+    return {k:k,id:x};
+  }
+  return null;
+}
+function normPhotos(l){return (l||[]).map(toPhoto).filter(Boolean);}
+function normRow(r){
+  var o=Object.assign({id:newId(),name:'',type:'heat',sp:'',setOn:'',setOff:'',onF:'',offF:'',note:'',u:0},r);
+  o.id=String(o.id);o.photos=normPhotos(r&&r.photos);return o;
+}
+function normNote(n){
+  var o=Object.assign({id:newId(),no:1,date:todayStr(),title:'',tc:'#000000',cc:'#f3e0b0',html:'',text:'',u:0},n);
+  o.id=String(o.id);o.photos=normPhotos(n&&n.photos);return o;
+}
+function normGH(g,i){
+  var o=Object.assign(newGH(i+1),g);if(!g.id)o.id='g'+(i+1);o.o=+o.o||i+1;
+  o.rows=(g.rows||[]).map(normRow);o.del=g.del||{};return o;
+}
+function normData(d){
+  var n=newData();
+  if(d&&Array.isArray(d.gh)&&d.gh.length)n.gh=d.gh.slice(0,30).map(function(g,i){return normGH(g,i);});
+  n.notes=((d&&d.notes)||[]).map(normNote);
+  n.ndel=(d&&d.ndel)||{};n.gdel=(d&&d.gdel)||{};
+  n.cfg=Object.assign(defCfg(),(d&&d.cfg)||{});
+  n.cfg.labels=n.cfg.labels||{};
+  n.gh.forEach(function(g,i){var l=n.cfg.labels['gh'+i];if(l){if(!g.title)g.title=l;delete n.cfg.labels['gh'+i];}});
+  return n;
+}
+
+/* ---------- merge (দুই ডিভাইসের ডাটা মেলানো) ---------- */
+function mergeDel(x,y){var o={},k;for(k in x)o[k]=x[k];for(k in y)o[k]=Math.max(o[k]||0,y[k]);return o;}
+function idNum(id){return parseInt(String(id).slice(0,13),10)||0;}
+function mergeList(a,b,del){
+  var m={};
+  a.concat(b).forEach(function(r){var c=m[r.id];if(!c||(r.u||0)>(c.u||0))m[r.id]=r;});
+  var out=[];
+  Object.keys(m).forEach(function(id){if(del[id]&&del[id]>=(m[id].u||0))return;out.push(m[id]);});
+  out.sort(function(x,y){return idNum(x.id)-idNum(y.id)||(x.id<y.id?-1:1);});
+  return out;
+}
+function mergeData(L,Rraw){
+  var R=normData(Rraw),out=newData(),A={},B={},ids=[];
+  out.gdel=mergeDel(L.gdel||{},R.gdel||{});
+  L.gh.forEach(function(g){A[g.id]=g;ids.push(g.id);});
+  R.gh.forEach(function(g){B[g.id]=g;if(!A[g.id])ids.push(g.id);});
+  out.gh=[];
+  ids.forEach(function(id){
+    var a=A[id],b=B[id],nw=(a&&b)?((b.su||0)>(a.su||0)?b:a):(a||b),o=newGH(1);
+    var su=Math.max(a?a.su||0:0,b?b.su||0:0);
+    if(out.gdel[id]&&out.gdel[id]>=su)return;
+    o.id=id;o.o=nw.o;o.title=nw.title||'';o.name=nw.name;o.lastUpdate=nw.lastUpdate;o.heat=nw.heat;o.cool=nw.cool;
+    o.su=su;o.testTemp=a?a.testTemp||'':'';
+    o.del=mergeDel(a?a.del||{}:{},b?b.del||{}:{});
+    o.rows=mergeList(a?a.rows:[],b?b.rows:[],o.del);
+    out.gh.push(o);
+  });
+  out.gh.sort(function(x,y){return (x.o-y.o)||(x.id<y.id?-1:1);});
+  if(!out.gh.length)out.gh=[newGH(1)];
+  out.ndel=mergeDel(L.ndel||{},R.ndel||{});
+  out.notes=mergeList(L.notes,R.notes,out.ndel);
+  out.cfg=((R.cfg.u||0)>(L.cfg.u||0))?R.cfg:L.cfg;
+  return out;
+}
+function sigOf(){
+  if(!D)return '';
+  var str=JSON.stringify(D,function(k,v){
+    if(k==='testTemp'||k==='text')return undefined;
+    if(k==='photos'&&Array.isArray(v))return v.map(function(p){return p.k;});
+    return v;
+  });
+  str+='|'+P.name+'|'+(P.dob||'')+'|'+((P.avatar||'').length);
+  var h=5381;for(var i=0;i<str.length;i++){h=((h<<5)+h+str.charCodeAt(i))|0;}
+  return String(h);
+}
+function allPhotos(){
+  var l=[];
+  D.gh.forEach(function(g){g.rows.forEach(function(r){l=l.concat(r.photos);});});
+  D.notes.forEach(function(n){l=l.concat(n.photos);});
+  return l;
+}
+
+/* ---------- storage of profile data ---------- */
+var saveT;
+function persistNow(){
+  if(!P)return;
+  try{localStorage.setItem(PK+P.id,JSON.stringify({d:D,m:M}));}
+  catch(e){toast('সেভ করা যায়নি — স্টোরেজ ভরে গেছে');}
+}
+function save(){
+  clearTimeout(saveT);saveT=setTimeout(persistNow,200);
+  scheduleSync();
+}
+window.addEventListener('beforeunload',function(){clearTimeout(saveT);persistNow();});
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden){clearTimeout(saveT);persistNow();}
+  else if(P)syncCycle().catch(function(){});
+});
+function loadProfile(p){
+  P=p;
+  var s=jget(PK+p.id,null)||{};
+  D=normData(s.d);
+  M=Object.assign({stamp:'',sig:''},s.m||{});
+}
+function cur(){return D.gh.filter(function(g){return g.id===activeId;})[0]||D.gh[0];}
+function cfg(){return D?D.cfg:defCfg();}
+
+var toastT;
+function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},2800);}
+function setMsg(id,type,text){
+  var el=$('#'+id);if(!el)return;
+  el.className='msg'+(type&&type!=='busy'?' '+type:'');
+  el.textContent=text+(type==='busy'||!type?'':'  ('+new Date().toLocaleTimeString()+')');
+}
+function errText(e){return (e&&(e.msg||e.message))||'অজানা ত্রুটি';}
+
+/* ---------- date format ---------- */
+function fmtDate(s){
+  if(!s)return '—';var p=s.split('-');if(p.length!==3)return s;
+  var mi=(+p[1])-1,f=cfg().dateFmt||'d M Y';
+  var map={d:p[2],M:MON[mi],F:MONF[mi],m:p[1],Y:p[0]};
+  return f.replace(/[dMFmY]/g,function(c){return map[c];});
+}
+
+/* =====================================================================
+   Photos: IndexedDB cache + Drive fetch
+   ===================================================================== */
+var PC={},DBP=null;
+function db(){
+  if(DBP)return DBP;
+  DBP=new Promise(function(res,rej){
+    var r=indexedDB.open('ghPhotos',1);
+    r.onupgradeneeded=function(){r.result.createObjectStore('p');};
+    r.onsuccess=function(){res(r.result);};
+    r.onerror=function(){rej(r.error);};
+  });
+  return DBP;
+}
+function pGet(k){
+  return db().then(function(d){return new Promise(function(res){
+    var q=d.transaction('p').objectStore('p').get(k);
+    q.onsuccess=function(){res(q.result||'');};q.onerror=function(){res('');};
+  });}).catch(function(){return '';});
+}
+function pPut(k,v){
+  return db().then(function(d){return new Promise(function(res){
+    var t=d.transaction('p','readwrite');t.objectStore('p').put(v,k);
+    t.oncomplete=function(){res();};t.onerror=function(){res();};
+  });}).catch(function(){});
+}
+function photoLocal(k){
+  if(PC[k])return Promise.resolve(PC[k]);
+  return pGet(k).then(function(d){if(d)PC[k]=d;return d;});
+}
+function photoSrc(p){
+  return photoLocal(p.k).then(function(d){
+    if(d)return d;
+    if(p.id&&P&&urlOK()&&navigator.onLine){
+      return api('getPhoto',{id:P.id,auth:authOf(),photoId:p.id}).then(function(j){
+        if(j&&j.ok&&j.data){PC[p.k]=j.data;pPut(p.k,j.data);return j.data;}
+        return '';
+      }).catch(function(){return '';});
+    }
+    return '';
+  });
+}
+function setImg(img,p){photoSrc(p).then(function(s){if(s)img.src=s;});}
+function compress(file,max,q){
+  return new Promise(function(res,rej){
+    var fr=new FileReader();fr.onerror=rej;
+    fr.onload=function(){
+      var img=new Image();img.onerror=rej;
+      img.onload=function(){
+        var w=img.width,h=img.height,k=Math.min(1,max/Math.max(w,h));
+        var c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        res(c.toDataURL('image/jpeg',q));
+      };
+      img.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+function addPhotoFiles(files){
+  return Promise.all(files.map(function(f){return compress(f,1280,0.8);})).then(function(list){
+    return list.map(function(d){var k=uid();PC[k]=d;pPut(k,d);return {k:k,id:''};});
+  });
+}
+function drawGrid(box,arr,onChange){
+  box.innerHTML='';
+  arr.forEach(function(p,i){
+    var d=document.createElement('div');d.className='it';
+    var im=document.createElement('img');im.alt='';setImg(im,p);
+    var x=document.createElement('button');x.className='x';x.textContent='×';x.title='Remove';
+    x.onclick=function(){arr.splice(i,1);drawGrid(box,arr,onChange);if(onChange)onChange();};
+    d.appendChild(im);d.appendChild(x);box.appendChild(d);
+  });
+}
+
+/* =====================================================================
+   Modals + drag
+   ===================================================================== */
+function open(id){var o=$('#'+id);o.classList.add('open');var m=o.querySelector('.modal');if(m&&m._reset)m._reset();}
+function close(id){$('#'+id).classList.remove('open');}
+function dragify(modal){
+  var h=modal.querySelector('.mh');if(!h)return;
+  var ox=0,oy=0,sx=0,sy=0,cx=0,cy=0,dr=false,base=null;
+  modal._reset=function(){ox=oy=cx=cy=0;modal.style.transform='';};
+  h.addEventListener('pointerdown',function(e){
+    if(e.target.closest('button'))return;
+    dr=true;sx=e.clientX;sy=e.clientY;
+    var r=modal.getBoundingClientRect();base={l:r.left-ox,t:r.top-oy,w:r.width};
+    try{h.setPointerCapture(e.pointerId);}catch(x){}
+  });
+  h.addEventListener('pointermove',function(e){
+    if(!dr)return;
+    var nx=ox+e.clientX-sx,ny=oy+e.clientY-sy;
+    var left=Math.max(-base.w+90,Math.min(innerWidth-90,base.l+nx));
+    var top=Math.max(0,Math.min(innerHeight-44,base.t+ny));
+    cx=left-base.l;cy=top-base.t;
+    modal.style.transform='translate('+cx+'px,'+cy+'px)';
+  });
+  function up(){if(!dr)return;dr=false;ox=cx;oy=cy;}
+  h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up);
+}
+$$('.modal').forEach(dragify);
+document.addEventListener('click',function(e){var b=e.target.closest('[data-close]');if(b)close(b.dataset.close);});
+$$('.overlay.lb').forEach(function(o){o.addEventListener('mousedown',function(e){if(e.target===o)o.classList.remove('open');});});
+document.addEventListener('click',function(e){
+  var b=e.target.closest('.eye');if(!b)return;
+  var i=b.parentNode.querySelector('input');i.type=i.type==='password'?'text':'password';
+});
+
+/* ---------- lightbox ---------- */
+var LB={list:[],idx:0,edit:null,del:null};
+function openLb(list,i,edit,del){LB={list:list,idx:i,edit:edit,del:del};drawLb();open('mLb');}
+function drawLb(){
+  var ph=LB.list||[];if(!ph.length){close('mLb');return;}
+  LB.idx=(LB.idx+ph.length)%ph.length;
+  $('#lbImg').removeAttribute('src');setImg($('#lbImg'),ph[LB.idx]);
+  $('#lbCount').textContent=(LB.idx+1)+' / '+ph.length;
+  $('#lbPrev').style.display=$('#lbNext').style.display=ph.length>1?'':'none';
+  $('#lbEdit').style.display=LB.edit?'':'none';
+  $('#lbDel').style.display=LB.del?'':'none';
+}
+$('#lbPrev').onclick=function(e){e.stopPropagation();LB.idx--;drawLb();};
+$('#lbNext').onclick=function(e){e.stopPropagation();LB.idx++;drawLb();};
+$('#lbClose').onclick=function(){close('mLb');};
+$('#lbImg').onclick=function(){LB.idx++;drawLb();};
+$('#lbEdit').onclick=function(){close('mLb');if(LB.edit)LB.edit();};
+$('#lbDel').onclick=function(e){e.stopPropagation();if(LB.del&&confirm('এই ছবিটি মুছবেন?')){LB.del(LB.idx);drawLb();}};
+document.addEventListener('keydown',function(e){
+  if(!$('#mLb').classList.contains('open'))return;
+  if(e.key==='ArrowRight'){LB.idx++;drawLb();}
+  else if(e.key==='ArrowLeft'){LB.idx--;drawLb();}
+  else if(e.key==='Escape'){close('mLb');}
+});
+
+/* =====================================================================
+   Crypto / profiles
+   ===================================================================== */
+function sha(s){
+  var data=new TextEncoder().encode(s);
+  if(window.crypto&&crypto.subtle){
+    return crypto.subtle.digest('SHA-256',data).then(function(b){
+      return Array.prototype.map.call(new Uint8Array(b),function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
+    });
+  }
+  var h1=5381,h2=52711;for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);h1=((h1<<5)+h1)^c;h2=((h2<<5)+h2)^c;}
+  return Promise.resolve('f'+(h1>>>0).toString(16)+(h2>>>0).toString(16));
+}
+function hashPin(salt,pin){return sha(salt+':'+pin);}
+function normCode(c){return String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function hashRec(salt,code){return sha(salt+':'+normCode(code));}
+function rnd(n){var a=new Uint8Array(n);crypto.getRandomValues(a);return Array.prototype.map.call(a,function(x){return ('0'+x.toString(16)).slice(-2);}).join('').slice(0,n);}
+function mkRec(){
+  var al='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=new Uint8Array(12),s='';
+  crypto.getRandomValues(a);
+  for(var i=0;i<12;i++){s+=al[a[i]%al.length];if(i%4===3&&i<11)s+='-';}
+  return s;
+}
+function mkId(){return 'p'+now().toString(36)+rnd(4);}
+function findProf(id){return G.profiles.filter(function(p){return p.id===id;})[0];}
+function nameTaken(name,exceptId){
+  name=name.trim().toLowerCase();
+  return G.profiles.some(function(p){return p.id!==exceptId&&p.name.trim().toLowerCase()===name;});
+}
+async function createProfile(name,pin){
+  var salt=rnd(16),recSalt=rnd(16),code=mkRec();
+  var p={id:mkId(),name:name,salt:salt,hash:await hashPin(salt,pin),recSalt:recSalt,recHash:await hashRec(recSalt,code),avatar:''};
+  G.profiles.push(p);gsave();
+  try{localStorage.setItem(PK+p.id,JSON.stringify({d:newData(),m:{stamp:'',sig:''}}));}catch(e){}
+  return {p:p,code:code};
+}
+function memberRec(p){p=p||P;return {id:p.id,name:p.name,salt:p.salt,hash:p.hash,recSalt:p.recSalt,recHash:p.recHash,avatar:p.avatar||'',dob:p.dob||''};}
+function authOf(){return P.pend||{t:'pin',h:P.hash};}
+
+var recCb=null;
+function showRec(code,cb){
+  $('#recCode').textContent=code;$('#recOk').checked=false;$('#recDone').disabled=true;recCb=cb||null;
+  open('mRec');
+}
+$('#recOk').onchange=function(){$('#recDone').disabled=!this.checked;};
+$('#recCopy').onclick=function(){
+  var t=$('#recCode').textContent;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){toast('কপি হয়েছে');},function(){
+    var r=document.createRange();r.selectNodeContents($('#recCode'));var s=getSelection();s.removeAllRanges();s.addRange(r);
+    try{document.execCommand('copy');toast('কপি হয়েছে');}catch(e){toast('কোডটি হাতে সিলেক্ট করে কপি করুন');}
+  });
+};
+function recFinish(){
+  if(!$('#recOk').checked){toast('আগে কোডটি কপি করে টিক দিন');return;}
+  close('mRec');if(recCb){var f=recCb;recCb=null;f();}
+}
+$('#recDone').onclick=recFinish;$('#recX').onclick=recFinish;
+
+/* =====================================================================
+   API (Apps Script)
+   ===================================================================== */
+function urlProblem(u){
+  if(!u)return 'আগে Web Script Link দিন';
+  if(!/^https:\/\//i.test(u))return 'লিংক https:// দিয়ে শুরু হতে হবে';
+  if(u.indexOf('script.google.com')<0)return 'এটি Apps Script-এর লিংক নয়';
+  if(/\/dev(\?|$)/.test(u))return 'এটি টেস্ট লিংক (/dev)। Deploy করার পর পাওয়া /exec লিংক দিন';
+  if(u.indexOf('/macros/s/')<0||!/\/exec(\?|$)/.test(u))return 'লিংকটি .../macros/s/.../exec ধরনের হতে হবে (Deploy → Web app URL)';
+  return '';
+}
+function urlOK(){return !urlProblem(G.url);}
+function api(action,body,get){
+  var u=G.url,opts={cache:'no-store'};
+  if(get){u+=(u.indexOf('?')>-1?'&':'?')+'action='+action+'&folder='+encodeURIComponent(G.folder||'')+'&t='+now();}
+  else{opts.method='POST';opts.headers={'Content-Type':'text/plain;charset=utf-8'};opts.body=JSON.stringify(Object.assign({action:action,folder:G.folder||''},body));}
+  return fetch(u,opts).then(function(r){return r.text();},function(){throw {msg:'সার্ভারে পৌঁছানো যায়নি — ইন্টারনেট ও লিংক ঠিক আছে কিনা দেখুন',retry:true};})
+    .then(function(t){
+      var j;
+      try{j=JSON.parse(t);}
+      catch(e){throw {msg:'Google ঠিক উত্তর দেয়নি। Deploy-এ "Who has access" = Anyone আছে কিনা দেখুন এবং কোড বদলালে New version দিন',retry:true};}
+      if(j&&j.root&&action!=='renameRoot'&&j.root!==G.folder){G.folder=j.root;gsave();}
+      return j;
+    });
+}
+function retry(fn,n){
+  return fn().catch(function(e){
+    if(n<=1||!e||!e.retry)throw e;
+    return wait(1500).then(function(){return retry(fn,n-1);});
+  });
+}
+
+/* =====================================================================
+   Sync
+   ===================================================================== */
+var SY={busy:false,again:false,timer:null,poll:null};
+var CONN=navigator.connection||navigator.mozConnection||null;
+function chip(type,text){var c=$('#syncChip');c.className='chip'+(type?' '+type:'');c.textContent=text;}
+function nowTxt(){return fmtDate(todayStr())+', '+new Date().toLocaleTimeString();}
+function refreshChip(){
+  if(!P||!D)return;
+  if(!urlOK())chip('err',sigOf()!==M.sig?'✗ সিঙ্ক ব্যর্থ হয়েছে — Google লিংক দেওয়া নেই':'☁ Google সংযোগ নেই — Settings-এ লিংক দিন');
+  else if(!navigator.onLine)chip('err','☁ অফলাইন — অনলাইন হলে সিঙ্ক হবে');
+  else if(sigOf()!==M.sig)chip('err','☁ সিঙ্ক হচ্ছে…');
+  else if(M.last)chip('ok','✓ সিঙ্ক হয়েছে — '+M.last);
+  else chip('err','☁ এখনো সিঙ্ক হয়নি');
+}
+function canSync(force){
+  if(!P||!D||!urlOK()||!P.hash)return false;
+  if(!navigator.onLine)return false;
+  if(force)return true;
+  if(!G.auto)return false;
+  if(G.net==='wifi'&&CONN&&CONN.type&&CONN.type!=='wifi'&&CONN.type!=='ethernet')return false;
+  return true;
+}
+function scheduleSync(){
+  if(!P||!D||sigOf()===M.sig)return;
+  if(!canSync(false)){refreshChip();return;}
+  clearTimeout(SY.timer);chip('err','☁ সিঙ্ক হচ্ছে…');
+  SY.timer=setTimeout(function(){syncCycle().catch(function(){});},4000);
+}
+async function pullMerge(){
+  chip('err','☁ নতুন ডাটা আনা হচ্ছে…');
+  var j=await retry(function(){return api('getAll',{id:P.id,auth:authOf()});},3);
+  if(!j.ok)throw {msg:j.error||'ডাটা আনা যায়নি',auth:j.code==='auth'};
+  if(j.data)D=mergeData(D,j.data);
+  M.stamp=j.stamp||'';
+  persistNow();
+}
+async function pushState(){
+  chip('err','☁ ডাটা আপলোড হচ্ছে…');
+  var sigNow=sigOf(),uploads={},ph=allPhotos(),i,d;
+  for(i=0;i<ph.length;i++){
+    if(!ph[i].id){d=await photoLocal(ph[i].k);if(d)uploads[ph[i].k]=d;}
+  }
+  var data=JSON.parse(JSON.stringify(D,function(k,v){return k==='testTemp'?undefined:v;}));
+  var j=await retry(function(){return api('saveAll',{id:P.id,auth:authOf(),member:memberRec(),data:data,uploads:uploads,base:M.stamp||''});},2);
+  if(j.conflict)return 'conflict';
+  if(!j.ok)throw {msg:j.error||'পাঠানো যায়নি',auth:j.code==='auth'};
+  allPhotos().forEach(function(p){if(!p.id&&j.map&&j.map[p.k])p.id=j.map[p.k];});
+  M.stamp=j.stamp||'';M.sig=sigNow;
+  if(P.pend){delete P.pend;gsave();}
+  persistNow();
+  return 'ok';
+}
+async function doSync(opt){
+  var realDirty=sigOf()!==M.sig;
+  var st=await retry(function(){return api('stamp',{id:P.id,auth:authOf()});},3);
+  if(!st.ok)throw {msg:st.error||'সার্ভার ত্রুটি',auth:st.code==='auth'};
+  var pulled=false;
+  if((st.stamp||'')!==(M.stamp||'')){await pullMerge();pulled=true;}
+  if(pulled&&!realDirty){M.sig=sigOf();persistNow();}
+  var res={pulled:pulled,pushed:false};
+  if(!opt.pullOnly&&(opt.force||realDirty)){
+    for(var t=0;t<3;t++){
+      var r=await pushState();
+      if(r==='ok'){res.pushed=true;break;}
+      await pullMerge();res.pulled=true;
+      if(t===2)throw {msg:'দুই ডিভাইসের পরিবর্তন মেলানো যায়নি, আবার চেষ্টা করুন'};
+    }
+  }
+  if(res.pulled)scheduleRender();
+  return res;
+}
+function syncCycle(opt){
+  opt=opt||{};
+  if(!P)return Promise.resolve();
+  if(!canSync(opt.force)){
+    if(opt.force)return Promise.reject({msg:!urlOK()?urlProblem(G.url):!navigator.onLine?'ইন্টারনেট নেই':'সিঙ্ক করা যাচ্ছে না'});
+    return Promise.resolve();
+  }
+  if(SY.busy){SY.again=true;return Promise.resolve();}
+  SY.busy=true;chip('err','☁ সিঙ্ক হচ্ছে…');
+  return doSync(opt).then(function(r){
+    M.last=nowTxt();persistNow();chip('ok','✓ সিঙ্ক হয়েছে — '+M.last);
+    return r;
+  },function(e){
+    chip('err',(e&&e.auth?'✗ সিঙ্ক ব্যর্থ হয়েছে — PIN মেলেনি':'✗ সিঙ্ক ব্যর্থ হয়েছে')+' — '+nowTxt());
+    if(!e||!e.auth){clearTimeout(SY.timer);SY.timer=setTimeout(function(){syncCycle().catch(function(){});},30000);}
+    throw e;
+  }).then(function(r){return fin(r);},function(e){fin();throw e;});
+  function fin(r){SY.busy=false;if(SY.again){SY.again=false;scheduleSync();}return r;}
+}
+function startPoll(){clearInterval(SY.poll);SY.poll=setInterval(function(){if(P&&!document.hidden)syncCycle().catch(function(){});},30000);}
+window.addEventListener('online',function(){if(P)syncCycle().catch(function(){});updateNetBox();});
+window.addEventListener('offline',function(){updateNetBox();refreshChip();});
+var renderT=null;
+function scheduleRender(){
+  clearTimeout(renderT);
+  var a=document.activeElement;
+  var editing=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable)&&a.closest('#app');
+  if(editing||$$('.overlay.open').length){renderT=setTimeout(scheduleRender,3000);return;}
+  renderData();
+}
+
+/* =====================================================================
+   Navigation / shell
+   ===================================================================== */
+var TILE=['#26a69a','#3949ab','#8e24aa','#d81b60','#e65100','#9e9d24','#2e7d32','#00897b','#1e88e5','#5e35b1','#c62828'];
+function ghName(g){var i=D.gh.indexOf(g);return g.title||('Green House # '+(i+1));}
+function lab(id){var d={notes:'Notepad',set:'Settings & Backup'};return cfg().labels[id]||d[id];}
+function navItems(){
+  var l=D.gh.map(function(g){return {id:g.id,gh:g,t:ghName(g),ic:'🌱'};});
+  l.push({id:'add',t:'Add Card',ic:'➕',add:1},{id:'notes',t:lab('notes'),ic:'📝'},{id:'set',t:lab('set'),ic:'⚙️'});
+  return l;
+}
+function isMobile(){return window.matchMedia('(max-width:820px)').matches;}
+function applySb(){
+  document.documentElement.style.setProperty('--sbw',G.sbw+'px');
+  $('#app').classList.toggle('hide-sb',!!G.sbHide);
+}
+function toggleSb(){
+  if(isMobile()){$('#app').classList.toggle('sbopen');}
+  else{G.sbHide=!G.sbHide;gsave();applySb();}
+}
+$('#hamb').onclick=toggleSb;
+$('#sbHide').onclick=function(){if(isMobile())$('#app').classList.remove('sbopen');else{G.sbHide=true;gsave();applySb();}};
+$('#sbback').onclick=function(){$('#app').classList.remove('sbopen');};
+(function(){
+  var rz=$('#sbrz'),dr=false;
+  rz.addEventListener('pointerdown',function(e){dr=true;rz.classList.add('drag');try{rz.setPointerCapture(e.pointerId);}catch(x){}e.preventDefault();});
+  rz.addEventListener('pointermove',function(e){
+    if(!dr)return;
+    var w=Math.max(160,Math.min(440,e.clientX-$('#sb').getBoundingClientRect().left));
+    G.sbw=Math.round(w);document.documentElement.style.setProperty('--sbw',G.sbw+'px');
+  });
+  function up(){if(!dr)return;dr=false;rz.classList.remove('drag');gsave();}
+  rz.addEventListener('pointerup',up);rz.addEventListener('pointercancel',up);
+})();
+function go(id){
+  if(id==='add'){addCard();return;}
+  if(id==='notes'||id==='set')page=id;else{page='dash';activeId=id;}
+  $('#app').classList.remove('sbopen');
+  renderAll();
+  $('.scroll').scrollTop=0;
+}
+function addCard(){
+  if(D.gh.length>=30){toast('সর্বোচ্চ ৩০টি কার্ড করা যায়');return;}
+  var o=D.gh.reduce(function(m,g){return Math.max(m,g.o||0);},0)+1,g=newGH(o);
+  g.id='g'+now().toString(36)+rnd(3);g.su=now();
+  D.gh.push(g);activeId=g.id;page='dash';save();go(g.id);toast('নতুন কার্ড তৈরি হয়েছে');
+}
+function renderSidebar(){
+  var nav=$('#sbnav');nav.innerHTML='';
+  navItems().forEach(function(it){
+    var b=document.createElement('button');b.className='sbi'+(it.add?' sbadd':'');
+    if(it.gh?(page==='dash'&&it.id===cur().id):(!it.add&&it.id===page))b.classList.add('on');
+    b.textContent=it.ic+' '+it.t;
+    b.onclick=function(){go(it.id);};
+    nav.appendChild(b);
+  });
+}
+var PAGES={dash:'pDash',notes:'pNotes',set:'pSet'};
+var _cv=document.createElement('canvas').getContext('2d');
+function autoFit(el){
+  if(!el||!el.parentNode)return;
+  var hc=el.closest('.hcen')||el.parentNode,max=hc.clientWidth;if(!max)return;
+  var cs=getComputedStyle(el);_cv.font=cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily;
+  var pad=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight)+parseFloat(cs.borderLeftWidth)+parseFloat(cs.borderRightWidth),w=0;
+  (el.value||'').split('\n').forEach(function(t){w=Math.max(w,_cv.measureText(t).width);});
+  el.style.width=Math.min(max,Math.ceil(w+pad+8))+'px';
+  el.style.height='auto';el.style.height=(el.scrollHeight+el.offsetHeight-el.clientHeight)+'px';
+}
+function fitHead(){autoFit($('#dashTitle'));autoFit($('#locName'));}
+window.addEventListener('resize',fitHead);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitHead);
+['dashTitle','locName'].forEach(function(i){$('#'+i).addEventListener('keydown',function(e){if(e.key==='Enter')e.preventDefault();});});
+function renderHeader(){
+  var c=cfg(),t=$('#dashTitle'),l=$('#locName');
+  if(document.activeElement!==t)t.value=c.dashTitle;
+  if(document.activeElement!==l)l.value=cur().name;
+  var sel=$('#profSel');sel.innerHTML='';
+  G.profiles.filter(function(p){return p.hash;}).forEach(function(p){
+    var o=document.createElement('option');o.value=p.id;o.textContent=p.name;if(P&&p.id===P.id)o.selected=true;sel.appendChild(o);
+  });
+  $('#pnText').textContent=P?P.name:'';
+  var av=$('#av');
+  if(P&&P.avatar){$('#avImg').src=P.avatar;av.classList.add('has');}else{$('#avImg').removeAttribute('src');av.classList.remove('has');}
+  fitHead();
+}
+function renderData(){
+  applyTheme();renderHeader();renderSidebar();
+  if(page==='dash')renderDash();
+  if(page==='notes')renderNotes();
+}
+function renderAll(){
+  $('#setCardTitle').textContent='⚙️ '+lab('set');
+  applyTheme();renderHeader();renderSidebar();
+  Object.keys(PAGES).forEach(function(k){$('#'+PAGES[k]).classList.toggle('hidden',k!==page);});
+  if(page==='dash')renderDash();
+  else if(page==='notes')renderNotes();
+  else if(page==='set')fillSettings();
+}
+function applyTheme(){document.documentElement.dataset.theme=cfg().theme||'navy';}
+
+/* =====================================================================
+   Dashboard (ডাটা লজিক অপরিবর্তিত)
+   ===================================================================== */
+function num(v){if(v===''||v==null)return null;var n=parseFloat(v);return isNaN(n)?null:n;}
+function r1(n){return String(Math.round(n*10)/10);}
+function f2c(f){return (f-32)*5/9;}
+function c2f(c){return c*9/5+32;}
+function cOf(f){var n=num(f);return n==null?'':r1(f2c(n));}
+function recalc(row,field){
+  var sp=num(row.sp),so=num(row.setOn),sf=num(row.setOff),on=num(row.onF),of=num(row.offF);
+  if(field==='sp'){
+    if(sp==null)return;
+    if(so!=null)row.onF=r1(sp+so);else if(on!=null)row.setOn=r1(on-sp);
+    if(sf!=null)row.offF=r1(sp+sf);else if(of!=null)row.setOff=r1(of-sp);
+  }else if(field==='setOn'){if(sp!=null&&so!=null)row.onF=r1(sp+so);}
+  else if(field==='setOff'){if(sp!=null&&sf!=null)row.offF=r1(sp+sf);}
+  else if(field==='onF'){if(sp!=null&&on!=null)row.setOn=r1(on-sp);}
+  else if(field==='offF'){if(sp!=null&&of!=null)row.setOff=r1(of-sp);}
+}
+function statusOf(row){
+  var on=num(row.onF);
+  if(!G.testOnline||on==null)return 'Off';
+  var real=num(cur().testTemp);
+  if(real==null)return 'Off';
+  return real>=on?'ON':'Off';
+}
+var tbody=$('#tbody');
+var ROW_HTML='<td class="sn"></td>'+
+ '<td class="name"><input data-f="name" placeholder="Relay name &amp; no" autocomplete="off"><select data-f="type"><option value="heat">Heat</option><option value="cool">Cool</option></select></td>'+
+ '<td class="num"><input data-f="sp" inputmode="decimal" autocomplete="off"></td>'+
+ '<td class="num"><input data-f="setOn" inputmode="decimal" autocomplete="off"></td>'+
+ '<td class="num"><input data-f="setOff" inputmode="decimal" autocomplete="off"></td>'+
+ '<td class="fc"><label>F<input data-f="onF" inputmode="decimal" autocomplete="off"></label><label>C<input data-f="onC" inputmode="decimal" autocomplete="off"></label></td>'+
+ '<td class="fc"><label>F<input data-f="offF" inputmode="decimal" autocomplete="off"></label><label>C<input data-f="offC" inputmode="decimal" autocomplete="off"></label></td>'+
+ '<td class="st"><span class="pill">Off</span></td>'+
+ '<td class="note" data-act="note"><div class="npv"></div></td>'+
+ '<td class="photo"></td>'+
+ '<td class="del"><button class="trash" data-act="del" title="Delete row" aria-label="Delete row"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></td>';
+function findRow(id){return cur().rows.filter(function(r){return String(r.id)===String(id);})[0];}
+function setPill(tr,row){var st=statusOf(row),p=tr.querySelector('.pill');p.textContent=st;p.classList.toggle('on',st==='ON');}
+function fillRow(tr,row,skip){
+  var m={name:row.name,type:row.type,sp:row.sp,setOn:row.setOn,setOff:row.setOff,onF:row.onF,offF:row.offF,onC:cOf(row.onF),offC:cOf(row.offF)};
+  tr.querySelectorAll('[data-f]').forEach(function(el){
+    if(el===skip)return;
+    var v=m[el.dataset.f];v=(v==null?'':String(v));
+    if(el.value!==v)el.value=v;
+  });
+  setPill(tr,row);
+  var n=tr.querySelector('.npv');
+  n.textContent=row.note?row.note.replace(/\s+/g,' '):'নোট লিখুন…';
+  n.classList.toggle('empty',!row.note);
+}
+function renderPhotoCell(tr,row){
+  var td=tr.querySelector('td.photo');td.innerHTML='';
+  var ph=row.photos||[];
+  if(!ph.length){
+    var b=document.createElement('button');b.className='mini';b.dataset.act='padd';b.textContent='📷';b.title='Add photo';td.appendChild(b);return;
+  }
+  var w=document.createElement('div');w.className='pc';
+  var t=document.createElement('div');t.className='th';
+  var img=document.createElement('img');img.dataset.act='view';img.alt='Photo';setImg(img,ph[0]);t.appendChild(img);
+  if(ph.length>1){var c=document.createElement('span');c.className='cnt';c.textContent=ph.length;t.appendChild(c);}
+  var b2=document.createElement('button');b2.className='mini';b2.dataset.act='padd';b2.textContent='+';b2.title='Add / remove photo';
+  w.appendChild(t);w.appendChild(b2);td.appendChild(w);
+}
+function renderTable(){
+  tbody.innerHTML='';
+  var rows=cur().rows;
+  rows.forEach(function(row,i){
+    var tr=document.createElement('tr');tr.dataset.id=row.id;tr.innerHTML=ROW_HTML;
+    tr.querySelector('.sn').textContent=i+1;
+    tbody.appendChild(tr);
+    fillRow(tr,row,null);renderPhotoCell(tr,row);
+  });
+  $('#emptyMsg').style.display=rows.length?'none':'block';
+}
+function updateLive(){
+  var on=!!G.testOnline;
+  $('#onlineBadge').classList.toggle('on',on);
+  $('#onlineText').textContent=on?'অনলাইন':'অফলাইন';
+  var t=num(cur().testTemp);
+  $('#realF').value=(on&&t!=null)?r1(t):'';
+  $('#realC').value=(on&&t!=null)?r1(f2c(t)):'';
+  tbody.querySelectorAll('tr').forEach(function(tr){var row=findRow(tr.dataset.id);if(row)setPill(tr,row);});
+}
+function renderDash(){
+  var g=cur();
+  $('#dashCardTitle').textContent='🌱 '+ghName(g);
+  $('#dateText').textContent=fmtDate(g.lastUpdate);
+  $('#dateInput').value=g.lastUpdate||'';
+  $('#heat').value=g.heat;$('#cool').value=g.cool;
+  renderTable();updateLive();
+}
+$('#bDelCard').onclick=function(){
+  if(D.gh.length<2){toast('কমপক্ষে একটি কার্ড থাকতে হবে');return;}
+  var g=cur();
+  if(!confirm('"'+ghName(g)+'" কার্ড ও এর সব রো মুছে ফেলবেন?'))return;
+  D.gdel[g.id]=now();D.gh=D.gh.filter(function(x){return x!==g;});
+  activeId=D.gh[0].id;save();renderAll();
+};
+tbody.addEventListener('input',function(e){
+  var el=e.target,f=el.dataset.f;if(!f||f==='type')return;
+  var tr=el.closest('tr'),row=findRow(tr.dataset.id);if(!row)return;
+  var v=el.value.trim();
+  if(f==='name'){row.name=el.value;}
+  else if(f==='onC'||f==='offC'){
+    var n=num(v),key=f==='onC'?'onF':'offF';
+    row[key]=(n==null)?'':r1(c2f(n));recalc(row,key);
+  }else{row[f]=v;recalc(row,f);}
+  row.u=now();fillRow(tr,row,el);save();
+});
+tbody.addEventListener('change',function(e){
+  var el=e.target;if(el.dataset.f!=='type')return;
+  var tr=el.closest('tr'),row=findRow(tr.dataset.id);if(!row)return;
+  row.type=el.value;row.sp=cur()[row.type]||'';recalc(row,'sp');row.u=now();
+  fillRow(tr,row,null);save();
+});
+var noteRowId=null,photoRowId=null,photoDraft=[];
+tbody.addEventListener('click',function(e){
+  var a=e.target.closest('[data-act]');if(!a)return;
+  var tr=a.closest('tr'),row=findRow(tr.dataset.id);if(!row)return;
+  var act=a.dataset.act;
+  if(act==='del'){
+    if(confirm('এই রো মুছে ফেলবেন?')){
+      var g=cur();g.del[row.id]=now();
+      g.rows=g.rows.filter(function(r){return r!==row;});save();renderTable();
+    }
+  }else if(act==='note'){
+    noteRowId=row.id;$('#noteText').value=row.note||'';open('mRowNote');$('#noteText').focus();
+  }else if(act==='padd'){openPhoto(row);}
+  else if(act==='view'){openLb(row.photos,0,function(){openPhoto(row);});}
+});
+$('#btnAdd').onclick=function(){
+  var g=cur();
+  var row={id:newId(),name:'',type:'heat',sp:g.heat||'',setOn:'',setOff:'',onF:'',offF:'',note:'',photos:[],u:now()};
+  g.rows.push(row);save();renderTable();
+  var last=tbody.lastElementChild;
+  if(last){last.scrollIntoView({block:'nearest',behavior:'smooth'});var i=last.querySelector('[data-f="name"]');if(i)i.focus({preventScroll:true});}
+};
+function refreshAllRows(){tbody.querySelectorAll('tr').forEach(function(tr){var r=findRow(tr.dataset.id);if(r)fillRow(tr,r,null);});}
+['heat','cool'].forEach(function(k){
+  $('#'+k).addEventListener('input',function(){
+    var v=this.value.trim();cur()[k]=v;cur().su=now();
+    cur().rows.forEach(function(r){if(r.type===k){r.sp=v;recalc(r,'sp');r.u=now();}});
+    refreshAllRows();save();
+  });
+});
+$('#convF').addEventListener('input',function(){var n=num(this.value);$('#convC').value=n==null?'':r1(f2c(n));});
+$('#convC').addEventListener('input',function(){var n=num(this.value);$('#convF').value=n==null?'':r1(c2f(n));});
+$('#locName').addEventListener('input',function(){cur().name=this.value;cur().su=now();autoFit(this);save();});
+$('#dashTitle').addEventListener('input',function(){cfg().dashTitle=this.value;cfg().u=now();autoFit(this);save();});
+$('#dateInput').addEventListener('click',function(){try{this.showPicker();}catch(e){}});
+$('#dateInput').addEventListener('change',function(){cur().lastUpdate=this.value;cur().su=now();$('#dateText').textContent=fmtDate(this.value);save();});
+
+/* row note modal */
+$('#noteSave').onclick=function(){
+  var row=findRow(noteRowId);
+  if(row){row.note=$('#noteText').value;row.u=now();save();
+    var tr=tbody.querySelector('tr[data-id="'+row.id+'"]');if(tr)fillRow(tr,row,null);}
+  close('mRowNote');
+};
+/* row photo modal */
+function openPhoto(row){photoRowId=row.id;photoDraft=(row.photos||[]).map(function(p){return {k:p.k,id:p.id};});$('#photoFile').value='';drawGrid($('#pgrid'),photoDraft);open('mPhoto');}
+$('#photoFile').addEventListener('change',function(){
+  var files=Array.prototype.slice.call(this.files||[]);if(!files.length)return;
+  toast('ছবি প্রস্তুত হচ্ছে…');
+  addPhotoFiles(files).then(function(list){photoDraft=photoDraft.concat(list);drawGrid($('#pgrid'),photoDraft);toast(list.length+' টি ছবি যোগ হয়েছে');})
+    .catch(function(){toast('ছবি পড়া যায়নি');});
+  this.value='';
+});
+$('#photoSave').onclick=function(){
+  var row=findRow(photoRowId);
+  if(row){row.photos=photoDraft.slice();row.u=now();save();
+    var tr=tbody.querySelector('tr[data-id="'+row.id+'"]');if(tr)renderPhotoCell(tr,row);}
+  close('mPhoto');
+};
+
+/* =====================================================================
+   Notepad
+   ===================================================================== */
+var TCOL=['#000000','#e53935','#2e9e4b','#1f6fc4','#f57c00','#8e24aa','#00796b'];
+var CCOL=['#f3e0b0','#fff3a3','#c8f5d4','#cfe5ff','#fbd1e4','#dcd3fa','#fbd7ae','#e5e7e9'];
+var MCOL=['#ffe03a','#ffa8a8','#9be7a6','#9cc9ff','#ffbd7a','#e0c8f8'];
+function sanitize(h){return String(h||'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi,'');}
+function noteList(){
+  var q=$('#nSearch').value.trim().toLowerCase(),f=$('#nFrom').value,t=$('#nTo').value;
+  return D.notes.filter(function(n){
+    if(q&&(n.title+' '+(n.text||'')).toLowerCase().indexOf(q)<0)return false;
+    if(f&&n.date<f)return false;if(t&&n.date>t)return false;return true;
+  }).sort(function(a,b){return (+a.no-+b.no)||(idNum(a.id)-idNum(b.id));});
+}
+function renderNotes(){
+  $('#notesCardTitle').textContent='📝 '+lab('notes');
+  document.documentElement.style.setProperty('--isz',G.isz+'px');
+  document.documentElement.style.setProperty('--csz',G.csz+'px');
+  $('#nIsz').value=G.isz;$('#nCsz').value=G.csz;
+  var g=$('#nGrid');g.innerHTML='';
+  var list=noteList();
+  if(!list.length){g.innerHTML='<div class="empty-msg" style="grid-column:1/-1">কোনো নোট নেই — "+ নতুন এন্ট্রি" চাপুন</div>';return;}
+  list.forEach(function(n){
+    var c=document.createElement('div');c.className='ncard';c.style.background=n.cc;
+    c.innerHTML='<div class="ic"><button data-a="edit" title="Edit">✏️</button><button data-a="del" title="Delete">🗑</button></div>'+
+      '<div class="ln"><b>No:</b> <span class="v1"></span></div><div class="ln"><b>Date:</b> <span class="v2"></span></div>'+
+      '<div class="tl"></div><div class="th"></div>';
+    c.querySelector('.v1').textContent=n.no;c.querySelector('.v2').textContent=fmtDate(n.date);
+    var tl=c.querySelector('.tl');tl.textContent='Title: '+(n.title||'');tl.style.color=n.tc||'#000';
+    var th=c.querySelector('.th');
+    if(n.photos&&n.photos.length){
+      th.className='nth';var im=document.createElement('img');im.alt='';setImg(im,n.photos[0]);
+      im.onclick=function(e){e.stopPropagation();openLb(n.photos,0,function(){openNote(n.id);});};
+      th.appendChild(im);
+      if(n.photos.length>1){var cn=document.createElement('span');cn.className='cnt';cn.textContent=n.photos.length;th.appendChild(cn);}
+    }
+    c.onclick=function(e){
+      var b=e.target.closest('[data-a]');
+      if(b&&b.dataset.a==='del'){e.stopPropagation();delNote(n.id);return;}
+      openNote(n.id);
+    };
+    g.appendChild(c);
+  });
+}
+function delNote(id){
+  if(!confirm('এই নোট মুছে ফেলবেন?'))return;
+  D.ndel[id]=now();D.notes=D.notes.filter(function(n){return n.id!==id;});save();renderNotes();
+}
+['nSearch','nFrom','nTo'].forEach(function(i){$('#'+i).addEventListener('input',renderNotes);});
+$('#nClear').onclick=function(){$('#nSearch').value='';$('#nFrom').value='';$('#nTo').value='';renderNotes();};
+$('#nIsz').addEventListener('input',function(){G.isz=+this.value;gsave();document.documentElement.style.setProperty('--isz',G.isz+'px');});
+$('#nCsz').addEventListener('input',function(){G.csz=+this.value;gsave();document.documentElement.style.setProperty('--csz',G.csz+'px');});
+$('#nAdd').onclick=function(){openNote(null);};
+
+var NE={id:null,tc:'#000000',cc:'#f3e0b0',photos:[]};
+function buildPal(box,colors,curc,cb){
+  box.innerHTML='';
+  colors.forEach(function(c){
+    var b=document.createElement('button');b.type='button';b.className='sw'+(c===curc?' sel':'');b.style.background=c;
+    b.onclick=function(){cb(c);if(curc!==undefined){curc=c;$$('.sw',box).forEach(function(x){x.classList.toggle('sel',x===b);});}};
+    box.appendChild(b);
+  });
+}
+function drawNPh(){
+  var box=$('#nPhotos');box.innerHTML='';
+  if(!NE.photos.length)return;
+  var w=document.createElement('div');w.className='nth';w.style.setProperty('--isz','52px');
+  var im=document.createElement('img');im.alt='';setImg(im,NE.photos[0]);
+  im.onclick=function(){openLb(NE.photos,0,null,function(i){NE.photos.splice(i,1);drawNPh();});};
+  w.appendChild(im);
+  if(NE.photos.length>1){var c=document.createElement('span');c.className='cnt';c.textContent=NE.photos.length;w.appendChild(c);}
+  box.appendChild(w);
+}
+function openNote(id){
+  var n=id?D.notes.filter(function(x){return x.id===id;})[0]:null;
+  NE={id:n?n.id:null,tc:n?n.tc:'#000000',cc:n?n.cc:'#f3e0b0',photos:n?n.photos.map(function(p){return {k:p.k,id:p.id};}):[]};
+  var no=n?n.no:(D.notes.reduce(function(m,x){return Math.max(m,+x.no||0);},0)+1);
+  $('#nNo').value=no;$('#nDate').value=n?n.date:todayStr();$('#nTitle').value=n?n.title:'';
+  $('#nmTitle').textContent=(n&&n.title)||'নতুন নোট';
+  $('#nTitle').style.color=NE.tc;
+  $('#nEd').innerHTML=n?sanitize(n.html):'';
+  buildPal($('#palT'),TCOL,NE.tc,function(c){NE.tc=c;$('#nTitle').style.color=c;});
+  buildPal($('#palC'),CCOL,NE.cc,function(c){NE.cc=c;});
+  buildPal($('#palX'),TCOL.concat(['#d81b60']),undefined,function(c){fmt('foreColor',c);});
+  buildPal($('#palM'),MCOL,undefined,function(c){fmt('hiliteColor',c);});
+  drawNPh();
+  $('#nDel').style.display=n?'':'none';
+  open('mNote');
+}
+$('#nTitle').addEventListener('input',function(){$('#nmTitle').textContent=this.value||'নতুন নোট';});
+var ed=$('#nEd');
+function fmt(cmd,val){
+  ed.focus();
+  try{document.execCommand('styleWithCSS',false,true);}catch(e){}
+  document.execCommand(cmd,false,val);
+}
+function listStyle(type){
+  var s=getSelection();if(!s.anchorNode)return;
+  var n=s.anchorNode.nodeType===3?s.anchorNode.parentNode:s.anchorNode;
+  var l=n.closest&&n.closest('ul,ol');if(l&&ed.contains(l))l.style.listStyleType=type;
+}
+['#tools','#palX','#palM'].forEach(function(s){$(s).addEventListener('mousedown',function(e){if(e.target.tagName!=='SELECT')e.preventDefault();});});
+$('#tools').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  var c=b.dataset.cmd;
+  if(c==='bold'||c==='underline')fmt(c);
+  else if(c==='tick')fmt('insertHTML','<div class="tk"><input type="checkbox"><span>&nbsp;</span></div>');
+  else if(c==='disc'){fmt('insertUnorderedList');listStyle('disc');}
+  else if(c==='square'){fmt('insertUnorderedList');listStyle('square');}
+  else if(c==='num'){fmt('insertOrderedList');listStyle('decimal');}
+});
+$('#fsz').addEventListener('change',function(){if(this.value)fmt('fontSize',this.value);this.value='';});
+$('#xClr').onclick=function(){fmt('foreColor','#16212b');};
+$('#mClr').onclick=function(){fmt('hiliteColor','transparent');};
+ed.addEventListener('change',function(e){
+  var t=e.target;if(t.type==='checkbox'){if(t.checked)t.setAttribute('checked','');else t.removeAttribute('checked');}
+});
+$('#nPhotoFile').addEventListener('change',function(){
+  var files=Array.prototype.slice.call(this.files||[]);if(!files.length)return;
+  toast('ছবি প্রস্তুত হচ্ছে…');
+  addPhotoFiles(files).then(function(list){NE.photos=NE.photos.concat(list);drawNPh();})
+    .catch(function(){toast('ছবি পড়া যায়নি');});
+  this.value='';
+});
+$('#nSave').onclick=function(){
+  var n={id:NE.id||newId(),no:parseInt($('#nNo').value,10)||1,date:$('#nDate').value||todayStr(),title:$('#nTitle').value,
+    tc:NE.tc,cc:NE.cc,html:sanitize(ed.innerHTML),text:ed.innerText||'',photos:NE.photos.slice(),u:now()};
+  var i=-1;D.notes.forEach(function(x,k){if(x.id===n.id)i=k;});
+  if(i>=0)D.notes[i]=n;else D.notes.push(n);
+  delete D.ndel[n.id];
+  save();renderNotes();close('mNote');
+};
+$('#nDel').onclick=function(){if(NE.id&&confirm('এই নোট ডিলিট করবেন?')){D.ndel[NE.id]=now();D.notes=D.notes.filter(function(x){return x.id!==NE.id;});save();renderNotes();close('mNote');}};
+$('#nWipe').onclick=function(){if(confirm('নোটের লেখা পুরোটা মুছবেন?'))ed.innerHTML='';};
+
+/* =====================================================================
+   Settings page
+   ===================================================================== */
+var THEMES=[
+  {id:'navy',pri:'#0f5c9c',sb:'#0f2438'},{id:'sky',pri:'#3f9bef',sb:'#121b28'},{id:'brown',pri:'#7a5c33',sb:'#2a2622'},
+  {id:'amber',pri:'#f5b041',sb:'#0b1b2e'},{id:'cyan',pri:'#1593c4',sb:'#0b3a53'},{id:'mix',pri:'conic',sb:'conic'},
+  {id:'rose',pri:'#cc3366',sb:'#4a1530'},{id:'green',pri:'#2e9e4b',sb:'#0f3a1d'},{id:'orange',pri:'#f26b0f',sb:'#4a2208'},{id:'purple',pri:'#6d4adf',sb:'#271f5e'}
+];
+function buildThemes(){
+  var box=$('#themeRow');box.innerHTML='';
+  THEMES.forEach(function(t){
+    var b=document.createElement('button');b.className='thm'+(cfg().theme===t.id?' sel':'');b.title=t.id;
+    b.style.background=t.pri==='conic'?'conic-gradient(#ff5f6d,#ffc371,#47e891,#3ab0ff,#a56bff,#ff5f6d)':'linear-gradient(135deg,'+t.pri+' 50%,'+t.sb+' 50%)';
+    b.onclick=function(){cfg().theme=t.id;cfg().u=now();applyTheme();save();buildThemes();};
+    box.appendChild(b);
+  });
+}
+function buildLabels(){
+  var box=$('#labelGrid');box.innerHTML='';
+  navItems().filter(function(it){return !it.add;}).forEach(function(it,i){
+    var c=TILE[i%TILE.length],def=it.gh?'':({notes:'Notepad',set:'Settings & Backup'})[it.id];
+    var d=document.createElement('div');d.className='ltile';d.style.setProperty('--c',c);d.style.background=c+'1f';
+    var sm=document.createElement('small');sm.textContent=it.gh?'Green House # '+(D.gh.indexOf(it.gh)+1):def;
+    var inp=document.createElement('input');inp.value=it.t;
+    inp.addEventListener('input',function(){
+      var v=this.value;
+      if(it.gh){it.gh.title=(v.trim()&&v!==sm.textContent)?v:'';it.gh.su=now();}
+      else{if(!v.trim()||v===def)delete cfg().labels[it.id];else cfg().labels[it.id]=v;cfg().u=now();}
+      renderSidebar();save();
+    });
+    d.appendChild(sm);d.appendChild(inp);box.appendChild(d);
+  });
+}
+$('#bLabelDef').onclick=function(){cfg().labels={};cfg().u=now();D.gh.forEach(function(g){g.title='';g.su=now();});buildLabels();renderSidebar();save();};
+function ageTxt(dob){
+  var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(dob||'');if(!m)return '';
+  var t=new Date(),y=t.getFullYear()-(+m[1]),mo=t.getMonth()+1-(+m[2]);
+  if(t.getDate()<(+m[3]))mo--;if(mo<0){y--;mo+=12;}
+  return y<0?'':y+' বছর '+mo+' মাস';
+}
+function updatePf(){
+  var d=P.dob;$('#pfInfo').textContent=d?'— জন্মতারিখ: '+fmtDate(d)+' · বয়স: '+ageTxt(d):'';
+}
+function fillSettings(){
+  buildThemes();buildLabels();
+  $('#pfName').value=P.name;$('#pfDob').value=P.dob||'';pfAvatar=null;
+  if(P.avatar)$('#pfImg').src=P.avatar;else $('#pfImg').removeAttribute('src');
+  updatePf();
+  $('#sFolder').value=G.folder||'';$('#sUrl').value=G.url||'';updatePath();
+  $('#sDate').value=cfg().dateFmt;$('#todayShow').textContent=fmtDate(todayStr());
+  var c=cfg();$('#aName').value=c.appName;$('#aShort').value=c.short;$('#aIcon').value=c.icon;$('#aColor').value=c.iconColor;
+  $('#sAuto').checked=!!G.auto;$('#sNet').value=G.net;
+  $('#tOnline').checked=!!G.testOnline;$('#tTemp').value=cur().testTemp||'';
+  $('#tTempLabel').textContent=ghName(cur())+' — Real Temperature (°F)';
+  updateNetBox();
+}
+function updatePath(){$('#pathHint').innerHTML='সব ডাটা ও ছবি এই ফোল্ডারের ভেতরে প্রতিটি প্রোফাইলের নামে আলাদা সাব-ফোল্ডারে জমা হবে: <b>'+esc($('#sFolder').value.trim()||'GreenHouse Log')+'/'+esc(P?P.name:'প্রোফাইল')+'</b>';}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+$('#sFolder').addEventListener('input',updatePath);
+
+/* profile */
+var pfAvatar=null;
+$('#pfPhoto').addEventListener('change',function(){
+  var f=this.files&&this.files[0];if(!f)return;
+  compress(f,160,0.82).then(function(d){pfAvatar=d;$('#pfImg').src=d;});
+  this.value='';
+});
+$('#bPfSave').onclick=function(){
+  var v=$('#pfName').value.trim();
+  if(!v){setMsg('msgProf','err','নাম ফাঁকা রাখা যাবে না');return;}
+  if(nameTaken(v,P.id)){setMsg('msgProf','err','এই নামে আরেকটি প্রোফাইল আছে');return;}
+  P.name=v;P.dob=$('#pfDob').value;if(pfAvatar!==null){P.avatar=pfAvatar;pfAvatar=null;}
+  gsave();M.sig='';persistNow();renderHeader();updatePath();updatePf();save();
+  setMsg('msgProf','ok','সেভ হয়েছে ✔'+(urlOK()?' (Google Drive-এ ফোল্ডারের নামও বদলে যাবে)':''));
+};
+$('#bPinChange').onclick=async function(){
+  var c=$('#pfCur').value,n=$('#pfNew').value;
+  if(await hashPin(P.salt,c)!==P.hash){setMsg('msgProf','err','বর্তমান PIN ঠিক নয়');return;}
+  if(n.length<4){setMsg('msgProf','err','নতুন PIN কমপক্ষে ৪ ঘরের হতে হবে');return;}
+  if(!P.pend)P.pend={t:'pin',h:P.hash};
+  P.salt=rnd(16);P.hash=await hashPin(P.salt,n);gsave();
+  $('#pfCur').value=$('#pfNew').value='';setMsg('msgProf','ok','PIN বদলানো হয়েছে ✔');
+  M.sig='';save();
+};
+$('#bNewRec').onclick=async function(){
+  var code=mkRec();P.recSalt=rnd(16);P.recHash=await hashRec(P.recSalt,code);gsave();M.sig='';save();
+  showRec(code,function(){setMsg('msgProf','ok','নতুন রিকভারি কোড সেট হয়েছে ✔');});
+};
+$('#bAddMember').onclick=async function(){
+  var n=$('#nmName').value.trim(),p=$('#nmPin').value;
+  if(!n){setMsg('msgProf','err','নাম লিখুন');return;}
+  if(nameTaken(n)){setMsg('msgProf','err','এই নামে আরেকটি প্রোফাইল আছে');return;}
+  if(p.length<4){setMsg('msgProf','err','PIN কমপক্ষে ৪ ঘরের হতে হবে');return;}
+  var r=await createProfile(n,p);
+  $('#nmName').value=$('#nmPin').value='';
+  if(urlOK())api('register',{member:memberRec(r.p)}).catch(function(){});
+  renderHeader();
+  showRec(r.code,function(){setMsg('msgProf','ok','সদস্য "'+n+'" যোগ হয়েছে ✔ (সাইন আউট করে ওই প্রোফাইলে ঢুকতে পারবেন)');});
+};
+$('#bDelProf').onclick=async function(){
+  if(!confirm('"'+P.name+'" প্রোফাইল ও এই ডিভাইসের সব ডাটা মুছে ফেলবেন?'))return;
+  var id=P.id,cloud=urlOK()&&confirm('Google Drive/Sheet থেকেও এই সদস্যের ডাটা ও ফোল্ডার মুছবেন? (ট্র্যাশে যাবে)\n\nOK = হ্যাঁ, Cancel = শুধু এই ডিভাইস থেকে');
+  if(cloud){
+    try{var j=await api('deleteMember',{id:id,auth:authOf()});if(!j.ok){setMsg('msgProf','err','ক্লাউড থেকে মোছা যায়নি: '+(j.error||''));return;}}
+    catch(e){setMsg('msgProf','err',errText(e));return;}
+  }
+  localStorage.removeItem(PK+id);G.profiles=G.profiles.filter(function(p){return p.id!==id;});
+  if(G.last===id)G.last='';gsave();P=D=M=null;showLogin();
+};
+$('#bSignOut').onclick=function(){logout();};
+
+/* google */
+function readConn(){
+  var u=$('#sUrl').value.trim(),f=$('#sFolder').value.trim();
+  if(u!==G.url||f!==G.folder){if(M){M.stamp='';M.sig='';}}
+  G.url=u;G.folder=f;gsave();
+}
+$('#bGSave').onclick=async function(){
+  var oldF=G.folder,newF=$('#sFolder').value.trim(),u=$('#sUrl').value.trim();
+  if(oldF&&newF&&oldF!==newF&&u===G.url&&urlOK()&&P&&P.hash){
+    setMsg('msgG','busy','Google Drive-এ ফোল্ডারের নাম বদলানো হচ্ছে…');
+    try{
+      var j=await retry(function(){return api('renameRoot',{id:P.id,auth:authOf(),newName:newF});},2);
+      if(!j.ok){setMsg('msgG','err',j.error||'নাম বদলানো যায়নি');return;}
+      G.folder=j.root||newF;gsave();$('#sFolder').value=G.folder;
+    }catch(e){setMsg('msgG','err','নাম বদলানো যায়নি — '+errText(e));return;}
+  }
+  readConn();persistNow();updatePath();setMsg('msgG','ok','সংরক্ষিত হয়েছে ✔'+(oldF&&newF&&oldF!==newF?' (Drive-এর ফোল্ডারের নামও বদলেছে)':''));scheduleSync();refreshChip();
+};
+$('#bTest').onclick=function(){
+  readConn();var pr=urlProblem(G.url);if(pr){setMsg('msgG','err',pr);return;}
+  setMsg('msgG','busy','পরীক্ষা চলছে…');
+  retry(function(){return api('ping',null,true);},3).then(function(j){
+    if(j&&j.ok)setMsg('msgG','ok','সংযোগ সফল ✔');else setMsg('msgG','err','সংযোগ হয়েছে, কিন্তু Script-এর উত্তর ঠিক নয় — কোড পুরোটা বসিয়ে New version দিন');
+  }).catch(function(e){setMsg('msgG','err','সংযোগ ব্যর্থ — '+errText(e));});
+};
+$('#bSyncNow').onclick=function(){
+  readConn();setMsg('msgG','busy','সিঙ্ক চলছে… (ছবি থাকলে সময় লাগতে পারে)');
+  syncCycle({force:true}).then(function(r){
+    setMsg('msgG','ok',(r&&r.pulled?'নতুন ডাটা এসেছে; ':'')+(r&&r.pushed?'ডাটা পাঠানো হয়েছে':'কিছু পাঠানোর ছিল না')+' ✔');
+  }).catch(function(e){setMsg('msgG','err','সিঙ্ক ব্যর্থ — '+errText(e));});
+};
+$('#bPullNew').onclick=function(){
+  readConn();setMsg('msgG','busy','ডাটা আনা হচ্ছে…');
+  syncCycle({force:true,pullOnly:true}).then(function(r){
+    setMsg('msgG','ok',r&&r.pulled?'নতুন ডাটা এসেছে ✔':'নতুন কোনো ডাটা নেই ✔');
+  }).catch(function(e){setMsg('msgG','err','ডাটা আনা ব্যর্থ — '+errText(e));});
+};
+
+/* date format */
+$('#sDate').addEventListener('change',function(){cfg().dateFmt=this.value;cfg().u=now();$('#todayShow').textContent=fmtDate(todayStr());save();});
+
+/* app name & icon */
+var appImgEl=null;
+function loadAppImg(){if(G.appImg){appImgEl=new Image();appImgEl.src=G.appImg;}else appImgEl=null;}
+function makeIcon(size){
+  var c=document.createElement('canvas');c.width=c.height=size;var x=c.getContext('2d'),cf=cfg(),r=size*0.2;
+  x.fillStyle=cf.iconColor;x.beginPath();
+  x.moveTo(r,0);x.arcTo(size,0,size,size,r);x.arcTo(size,size,0,size,r);x.arcTo(0,size,0,0,r);x.arcTo(0,0,size,0,r);x.closePath();x.fill();
+  if(appImgEl&&appImgEl.complete&&appImgEl.naturalWidth){
+    x.save();x.clip();var s=Math.max(size/appImgEl.naturalWidth,size/appImgEl.naturalHeight),w=appImgEl.naturalWidth*s,h=appImgEl.naturalHeight*s;
+    x.drawImage(appImgEl,(size-w)/2,(size-h)/2,w,h);x.restore();
+  }else{
+    x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';
+    x.font=Math.round(size*0.56)+'px "Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif';
+    x.fillText(cf.icon||'🌿',size/2,size/2+size*0.03);
+  }
+  return c.toDataURL('image/png');
+}
+var manUrl=null;
+function setLink(rel,href){var l=document.querySelector('link[rel="'+rel+'"]');if(l)l.href=href;}
+function applyApp(){
+  var c=cfg();
+  document.title=c.appName;G.appName=c.appName;gsave();
+  $('#lgTitle').textContent=c.appName;
+  var ic=makeIcon(192);setLink('icon',ic);setLink('apple-touch-icon',ic);
+  var base=new URL('./',location.href).href;
+  var man={name:c.appName,short_name:c.short||c.appName,start_url:base,scope:base,display:'standalone',background_color:'#0f2438',theme_color:c.iconColor,
+    icons:[{src:makeIcon(512),sizes:'192x192 512x512',type:'image/png',purpose:'any'}]};
+  if(manUrl)URL.revokeObjectURL(manUrl);
+  manUrl=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:'application/manifest+json'}));
+  setLink('manifest',manUrl);
+}
+$('#aImg').addEventListener('change',function(){
+  var f=this.files&&this.files[0];if(!f)return;
+  compress(f,256,0.85).then(function(d){G.appImg=d;gsave();loadAppImg();toast('ছবি বাছাই হয়েছে — "প্রয়োগ করুন" চাপুন');});
+  this.value='';
+});
+$('#bApply').onclick=function(){
+  var c=cfg();c.appName=$('#aName').value.trim()||'Green House Log';c.short=$('#aShort').value.trim()||c.appName;
+  c.icon=$('#aIcon').value.trim()||'🌿';c.iconColor=$('#aColor').value;c.u=now();
+  applyApp();save();toast('প্রয়োগ হয়েছে');
+};
+$('#bAppDef').onclick=function(){
+  var d=defCfg(),c=cfg();c.appName=d.appName;c.short=d.short;c.icon=d.icon;c.iconColor=d.iconColor;c.u=now();
+  G.appImg='';gsave();loadAppImg();fillSettings();applyApp();save();
+};
+function dl(name,blob){
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},800);
+}
+function dataBlob(d){var p=d.split(','),b=atob(p[1]),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new Blob([u],{type:'image/png'});}
+$('#bDlApp').onclick=function(){
+  var c=cfg(),man={name:c.appName,short_name:c.short||c.appName,start_url:'./',scope:'./',display:'standalone',background_color:'#0f2438',theme_color:c.iconColor,
+    icons:[{src:'icon.png',sizes:'192x192 512x512',type:'image/png',purpose:'any'}]};
+  dl('manifest.webmanifest',new Blob([JSON.stringify(man,null,2)],{type:'application/manifest+json'}));
+  setTimeout(function(){dl('icon.png',dataBlob(makeIcon(512)));},500);
+  toast('২টি ফাইল ডাউনলোড হচ্ছে — GitHub-এর ফোল্ডারে বসিয়ে দিন');
+};
+
+/* sync control / offline */
+var deferredInstall=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredInstall=e;});
+$('#sAuto').addEventListener('change',function(){G.auto=this.checked;gsave();if(this.checked)scheduleSync();updateNetBox();});
+$('#sNet').addEventListener('change',function(){G.net=this.value;gsave();});
+$('#bInstall').onclick=function(){
+  if(deferredInstall){deferredInstall.prompt();deferredInstall=null;}
+  else setMsg('msgNet','','ব্রাউজারের মেনু (⋮) থেকে "Install app" / "হোম স্ক্রিনে যোগ করুন" চাপুন। GitHub Pages-এ (https) খুললে এটি কাজ করবে।');
+};
+$('#bPersist').onclick=function(){
+  if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().then(function(ok){setMsg('msgNet',ok?'ok':'err',ok?'স্থায়ী স্টোরেজ অনুমোদিত ✔':'ব্রাউজার অনুমতি দেয়নি (অ্যাপ ইনস্টল করলে সাধারণত অনুমোদিত হয়)');updateNetBox();});}
+  else setMsg('msgNet','err','এই ব্রাউজারে সমর্থিত নয়');
+};
+$('#bStatus').onclick=updateNetBox;
+function updateNetBox(){
+  var box=$('#netBox');if(!box)return;
+  var type=CONN?(CONN.type||CONN.effectiveType||'অজানা'):'অজানা';
+  var pend=(P&&D)?(sigOf()!==M.sig):false;
+  box.innerHTML='🌐 ইন্টারনেট: <b>'+(navigator.onLine?'আছে':'নেই')+'</b> · নেটওয়ার্ক: <b>'+esc(type)+'</b><br>'+
+    '⏳ সিঙ্কের অপেক্ষায় ডাটা: <b>'+(pend?'আছে':'নেই')+'</b><br>'+
+    '📱 অফলাইন মোড: <b>'+(('serviceWorker' in navigator&&navigator.serviceWorker.controller)?'প্রস্তুত (ডাটা এই ডিভাইসেই সেভ থাকে)':'ডাটা এই ডিভাইসে সেভ থাকে')+'</b><br>'+
+    '💾 স্থায়ী স্টোরেজ: <b id="persistTxt">…</b>';
+  if(navigator.storage&&navigator.storage.persisted)navigator.storage.persisted().then(function(p){var e=$('#persistTxt');if(e)e.textContent=p?'অনুমোদিত':'অনুমোদিত নয়';});
+  else{var e=$('#persistTxt');if(e)e.textContent='সমর্থিত নয়';}
+}
+$('#tOnline').addEventListener('change',function(){G.testOnline=this.checked;gsave();updateLive();});
+$('#tTemp').addEventListener('input',function(){cur().testTemp=this.value.trim();persistNow();updateLive();});
+
+/* backup */
+async function exportBackup(){
+  var copy=JSON.parse(JSON.stringify(D)),jobs=[];
+  function walk(list){list.forEach(function(p){jobs.push(photoSrc(p).then(function(d){p.d=d;}));});}
+  copy.gh.forEach(function(g){g.rows.forEach(function(r){walk(r.photos);});});
+  copy.notes.forEach(function(n){walk(n.photos);});
+  await Promise.all(jobs);
+  return {version:2,exportedAt:new Date().toISOString(),profile:P.name,data:copy};
+}
+$('#bBackup').onclick=function(){
+  setMsg('msgBackup','busy','ব্যাকআপ তৈরি হচ্ছে…');
+  exportBackup().then(function(b){
+    dl('greenhouse-backup-'+todayStr()+'.json',new Blob([JSON.stringify(b)],{type:'application/json'}));
+    setMsg('msgBackup','ok','ব্যাকআপ ফাইল ডাউনলোড হয়েছে ✔');
+  }).catch(function(){setMsg('msgBackup','err','ব্যাকআপ ব্যর্থ');});
+};
+$('#bRestore').onclick=function(){
+  var f=$('#fRestore').files&&$('#fRestore').files[0];
+  if(!f){setMsg('msgBackup','err','আগে ব্যাকআপ ফাইল বাছুন');return;}
+  var fr=new FileReader();
+  fr.onload=function(){
+    try{
+      var j=JSON.parse(fr.result),src=j.data||{gh:j.gh};
+      if(!src||!Array.isArray(src.gh))throw new Error('bad');
+      if(!confirm('বর্তমান ডাটা বদলে ব্যাকআপ থেকে রিস্টোর হবে। ঠিক আছে?'))return;
+      var old=normData(D),nd=normData(src);
+      if(!src.cfg)nd.cfg=old.cfg;
+      var t=now();
+      nd.gh.forEach(function(g,i){
+        var keep={};g.rows.forEach(function(r){r.u=t;keep[r.id]=1;});
+        g.del=Object.assign({},old.gh[i].del);
+        old.gh[i].rows.forEach(function(r){if(!keep[r.id])g.del[r.id]=t;});
+        g.testTemp=old.gh[i].testTemp;g.su=t;
+      });
+      var kn={};nd.notes.forEach(function(n){n.u=t;kn[n.id]=1;});
+      nd.ndel=Object.assign({},old.ndel);old.notes.forEach(function(n){if(!kn[n.id])nd.ndel[n.id]=t;});
+      nd.cfg.u=t;
+      D=nd;persistNow();save();renderAll();setMsg('msgBackup','ok','রিস্টোর সফল ✔');
+    }catch(e){setMsg('msgBackup','err','ফাইলটি সঠিক ব্যাকআপ নয়');}
+  };
+  fr.readAsText(f);
+};
+
+/* =====================================================================
+   Login
+   ===================================================================== */
+function fillLoginSel(pre){
+  var s=$('#lgSel'),f=$('#fgSel');s.innerHTML='';f.innerHTML='';
+  G.profiles.forEach(function(p){
+    [s,f].forEach(function(sel){var o=document.createElement('option');o.value=p.id;o.textContent=p.name+(p.hash?'':' (ক্লাউড)');sel.appendChild(o);});
+  });
+  var want=pre||G.last;if(want&&findProf(want))s.value=want;
+}
+function showLogin(pre){
+  clearTimeout(SY.timer);clearInterval(SY.poll);clearTimeout(renderT);
+  $('#app').classList.add('hidden');$('#login').classList.remove('hidden');
+  $('#lgTitle').textContent=G.appName||'Green House Log';
+  fillLoginSel(pre);$('#lgPin').value='';
+  setLm('',G.profiles.length?'':'প্রথমে একটি প্রোফাইল তৈরি করুন');
+  chip('','');
+  if(!G.profiles.length)openNew();
+}
+function setLm(type,t){var e=$('#lgMsg');e.className='lmsg'+(type?' '+type:'');e.textContent=t;}
+function enter(p){
+  loadProfile(p);G.last=p.id;gsave();
+  page='dash';activeId=D.gh[0].id;
+  $('#login').classList.add('hidden');$('#app').classList.remove('hidden');
+  applySb();applyApp();renderAll();startPoll();refreshChip();
+  syncCycle().catch(function(){});
+}
+function logout(pre){
+  if(P){clearTimeout(saveT);persistNow();}
+  P=D=M=null;showLogin(pre);
+}
+async function doLogin(){
+  var id=$('#lgSel').value,pin=$('#lgPin').value,p=findProf(id);
+  if(!p){setLm('','প্রোফাইল নেই — নতুন প্রোফাইল তৈরি করুন');return;}
+  if(!pin){setLm('','PIN দিন');return;}
+  setLm('ok','যাচাই হচ্ছে…');
+  var h=await hashPin(p.salt,pin);
+  if(p.hash){
+    if(h===p.hash){enter(p);return;}
+    if(urlOK()&&navigator.onLine){
+      var j=await api('stamp',{id:p.id,auth:{t:'pin',h:h}}).catch(function(){return null;});
+      if(j&&j.ok&&!j.none){p.hash=h;gsave();enter(p);return;}
+    }
+    setLm('','PIN ঠিক নয়');return;
+  }
+  if(!urlOK()){setLm('','আগে "Google সংযোগ" দিন');return;}
+  try{
+    var r=await api('getAll',{id:p.id,auth:{t:'pin',h:h}});
+    if(!r.ok){setLm('',r.error||'PIN ঠিক নয়');return;}
+    p.hash=h;delete p.remote;gsave();
+    localStorage.setItem(PK+p.id,JSON.stringify({d:normData(r.data),m:{stamp:r.stamp||'',sig:''}}));
+    enter(p);
+  }catch(e){setLm('',errText(e));}
+}
+$('#lgGo').onclick=doLogin;
+$('#lgPin').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+$('#profSel').addEventListener('change',function(){logout(this.value);});
+$('#av').onclick=function(){go('set');};
+
+/* new profile */
+function openNew(){$('#npName').value=$('#npPin').value=$('#npPin2').value='';$('#npMsg').textContent='';open('mNew');}
+$('#lkNew').onclick=function(e){e.preventDefault();openNew();};
+$('#npGo').onclick=async function(){
+  var n=$('#npName').value.trim(),a=$('#npPin').value,b=$('#npPin2').value,m=$('#npMsg');
+  if(!n){m.textContent='নাম লিখুন';return;}
+  if(nameTaken(n)){m.textContent='এই নামে আরেকটি প্রোফাইল আছে';return;}
+  if(a.length<4){m.textContent='PIN কমপক্ষে ৪ ঘরের হতে হবে';return;}
+  if(a!==b){m.textContent='দুইবারের PIN মেলেনি';return;}
+  var r=await createProfile(n,a);
+  if(urlOK())api('register',{member:memberRec(r.p)}).catch(function(){});
+  close('mNew');
+  showRec(r.code,function(){fillLoginSel(r.p.id);setLm('ok','প্রোফাইল তৈরি হয়েছে — PIN দিয়ে ঢুকুন');});
+};
+/* forgot */
+$('#lkForgot').onclick=function(e){
+  e.preventDefault();
+  if(!G.profiles.length){setLm('','কোনো প্রোফাইল নেই');return;}
+  $('#fgSel').value=$('#lgSel').value;$('#fgCode').value=$('#fgPin').value='';$('#fgMsg').textContent='';open('mForgot');
+};
+$('#fgGo').onclick=async function(){
+  var p=findProf($('#fgSel').value),code=$('#fgCode').value,pin=$('#fgPin').value,m=$('#fgMsg');
+  if(!p)return;
+  if(!normCode(code)){m.textContent='রিকভারি কোড দিন';return;}
+  if(pin.length<4){m.textContent='নতুন PIN কমপক্ষে ৪ ঘরের হতে হবে';return;}
+  m.className='msg';m.textContent='যাচাই হচ্ছে…';
+  var rh=await hashRec(p.recSalt,code),remote=null;
+  if(p.hash&&p.recHash){if(rh!==p.recHash){m.className='msg err';m.textContent='রিকভারি কোড মেলেনি';return;}}
+  else{
+    if(!urlOK()){m.className='msg err';m.textContent='আগে "Google সংযোগ" দিন';return;}
+    try{remote=await api('getAll',{id:p.id,auth:{t:'rec',h:rh}});}catch(e){m.className='msg err';m.textContent=errText(e);return;}
+    if(!remote.ok){m.className='msg err';m.textContent=remote.error||'কোড মেলেনি';return;}
+  }
+  var newCode=mkRec();
+  p.salt=rnd(16);p.hash=await hashPin(p.salt,pin);p.recSalt=rnd(16);p.recHash=await hashRec(p.recSalt,newCode);
+  p.pend={t:'rec',h:rh};delete p.remote;gsave();
+  if(remote)localStorage.setItem(PK+p.id,JSON.stringify({d:normData(remote.data),m:{stamp:remote.stamp||'',sig:''}}));
+  else{var s=jget(PK+p.id,null);if(s&&s.m){s.m.sig='';localStorage.setItem(PK+p.id,JSON.stringify(s));}}
+  close('mForgot');
+  showRec(newCode,function(){fillLoginSel(p.id);setLm('ok','নতুন PIN সেট হয়েছে — এখন ঢুকুন');});
+};
+/* google connect + members */
+$('#lkGoogle').onclick=function(e){e.preventDefault();$('#gUrl').value=G.url||'';$('#gFolder').value=G.folder||'';$('#gMsg').textContent='';open('mGoogle');};
+function gSaveConn(){G.url=$('#gUrl').value.trim();G.folder=$('#gFolder').value.trim();gsave();}
+$('#gSave').onclick=function(){
+  gSaveConn();var pr=urlProblem(G.url);
+  setMsg('gMsg',pr?'err':'ok',pr||'সংরক্ষিত হয়েছে ✔');
+};
+$('#gTest').onclick=function(){
+  gSaveConn();var pr=urlProblem(G.url);if(pr){setMsg('gMsg','err',pr);return;}
+  setMsg('gMsg','busy','পরীক্ষা চলছে…');
+  retry(function(){return api('ping',null,true);},3).then(function(j){
+    setMsg('gMsg',j&&j.ok?'ok':'err',j&&j.ok?'সংযোগ সফল ✔':'Script-এর উত্তর ঠিক নয়');
+  }).catch(function(e){setMsg('gMsg','err','সংযোগ ব্যর্থ — '+errText(e));});
+};
+$('#lkMembers').onclick=function(e){
+  e.preventDefault();
+  var pr=urlProblem(G.url);if(pr){setLm('',pr+' (Google সংযোগে দিন)');return;}
+  setLm('ok','সদস্য তালিকা আনা হচ্ছে…');
+  retry(function(){return api('members',null,true);},3).then(function(j){
+    if(!j.ok){setLm('',j.error||'তালিকা আনা যায়নি');return;}
+    var add=0;
+    (j.members||[]).forEach(function(m){
+      var p=findProf(m.id);
+      if(p){p.name=m.name;if(!p.recSalt)p.recSalt=m.recSalt;}
+      else{G.profiles.push({id:m.id,name:m.name,salt:m.salt,hash:'',recSalt:m.recSalt,recHash:'',remote:true});add++;}
+    });
+    gsave();fillLoginSel();
+    setLm('ok',(j.members||[]).length?'সদস্য তালিকা এসেছে ('+(j.members||[]).length+' জন) — প্রোফাইল বেছে PIN দিন':'সার্ভারে কোনো সদস্য নেই');
+  }).catch(function(er){setLm('',errText(er));});
+};
+
+/* =====================================================================
+   Init
+   ===================================================================== */
+loadAppImg();
+applySb();
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+}
+window.addEventListener('resize',function(){if(!isMobile())$('#app').classList.remove('sbopen');});
+showLogin();
+})();
+</script>
+</body>
+</html>

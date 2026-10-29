@@ -1,0 +1,12 @@
+{
+  "name": "Green House Log",
+  "short_name": "GH Log",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f2438",
+  "theme_color": "#0f5c9c",
+  "icons": [
+    { "src": "icon.png", "sizes": "192x192 512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
