@@ -336,6 +336,7 @@ input.bold{font-weight:800;font-size:17px;color:var(--ink);border-width:2px}
               <div class="ptitle">Real Temperature</div>
               <div class="pair"><label>F</label><input id="realF" class="real" readonly aria-label="Real temperature F"></div>
               <div class="pair"><label>C</label><input id="realC" class="real" readonly aria-label="Real temperature C"></div>
+              <div class="hint" id="wxPlace"></div>
             </section>
             <section class="panel">
               <div class="ptitle">Temperature Converter</div>
@@ -502,6 +503,19 @@ input.bold{font-weight:800;font-size:17px;color:var(--ink);border-width:2px}
           <label class="chk"><input type="checkbox" id="tOnline"> ড্যাশবোর্ড অনলাইন ধরুন</label>
           <div class="fld" style="max-width:300px;margin-top:8px"><label id="tTempLabel">Real Temperature (°F)</label><input id="tTemp" inputmode="decimal" placeholder="যেমন: 86" autocomplete="off">
             <div class="hint">আসল ডিভাইস যুক্ত হলে এই অংশ আর লাগবে না।</div></div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">🌡 রিয়েল টেম্পারেচার (ইন্টারনেট থেকে)</div>
+          <div class="infobox" id="wxBox"></div>
+          <div class="rowf">
+            <button id="bWxNow" class="btn primary">📍 লোকেশন অনুযায়ী এখনই আপডেট</button>
+            <div class="fld"><label>অথবা শহরের নাম</label><input id="wxCity" placeholder="যেমন: Riyadh" autocomplete="off"></div>
+            <button id="bWxCity" class="btn">এই শহর ব্যবহার করুন</button>
+            <button id="bWxAuto" class="btn">↺ অটো লোকেশন</button>
+          </div>
+          <div class="msg" id="msgWx"></div>
+          <div class="hint">ব্রাউজার লোকেশনের অনুমতি চাইলে "Allow" দিন; না দিলে আনুমানিক (IP) লোকেশন ব্যবহার হবে। তাপমাত্রা ১০ মিনিট পরপর হালনাগাদ হয় এবং সব কার্ডে একই দেখায়।</div>
         </div>
 
         <div class="card">
@@ -1237,11 +1251,61 @@ function recalc(row,field){
   else if(field==='onF'){if(sp!=null&&on!=null)row.setOn=r1(on-sp);}
   else if(field==='offF'){if(sp!=null&&of!=null)row.setOff=r1(of-sp);}
 }
+/* ---------- রিয়েল টেম্পারেচার (ইন্টারনেট থেকে) ---------- */
+var WX={f:null,at:0,place:'',err:'',busy:false,key:''};
+function realF(){
+  if(G.testOnline){var t=num(cur().testTemp);if(t!=null)return t;}
+  return navigator.onLine?WX.f:null;
+}
+function wxPos(){
+  if(G.manual)return Promise.resolve(G.manual);
+  return new Promise(function(res,rej){
+    if(!navigator.geolocation)return rej();
+    navigator.geolocation.getCurrentPosition(function(p){res({lat:p.coords.latitude,lon:p.coords.longitude});},rej,{timeout:8000,maximumAge:3600000});
+  }).catch(function(){
+    return fetch('https://ipwho.is/').then(function(r){return r.json();}).then(function(j){
+      if(!j||j.success===false)throw 0;
+      return {lat:j.latitude,lon:j.longitude,place:[j.city,j.country].filter(Boolean).join(', ')};
+    });
+  });
+}
+function wxName(p){
+  if(p.place)return Promise.resolve(p.place);
+  var k=p.lat.toFixed(2)+','+p.lon.toFixed(2);
+  if(WX.key===k&&WX.place)return Promise.resolve(WX.place);
+  return fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+p.lat+'&longitude='+p.lon+'&localityLanguage=en')
+    .then(function(r){return r.json();}).then(function(j){WX.key=k;return [j.city||j.locality,j.countryName].filter(Boolean).join(', ')||k;})
+    .catch(function(){return k;});
+}
+function fetchWx(){
+  if(!P||!navigator.onLine||WX.busy)return Promise.resolve();
+  WX.busy=true;
+  return wxPos().then(function(p){
+    return fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.lat+'&longitude='+p.lon+'&current=temperature_2m&temperature_unit=fahrenheit')
+      .then(function(r){return r.json();}).then(function(j){
+        var t=j&&j.current&&j.current.temperature_2m;if(typeof t!=='number')throw 0;
+        WX.f=t;WX.at=now();WX.err='';
+        return wxName(p).then(function(n){WX.place=n;});
+      });
+  }).catch(function(){WX.err='তাপমাত্রা আনা যায়নি — লোকেশনের অনুমতি/ইন্টারনেট দেখুন বা Settings-এ শহরের নাম দিন';})
+    .then(function(){WX.busy=false;updateLive();updateWxBox();});
+}
+function wxTxt(){
+  if(WX.f==null)return WX.err||(navigator.onLine?'তাপমাত্রা আনা হচ্ছে…':'অফলাইন');
+  var d=new Date(WX.at);
+  return '📍 '+WX.place+' · '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+function updateWxBox(){
+  var b=$('#wxBox');if(!b)return;
+  b.innerHTML='লোকেশন: <b>'+esc(G.manual?G.manual.place+' (নিজে দেওয়া)':'অটো (কম্পিউটার/মোবাইলের লোকেশন)')+'</b><br>'+
+    'বর্তমান তাপমাত্রা: <b>'+(WX.f!=null?r1(WX.f)+' °F / '+r1(f2c(WX.f))+' °C':'—')+'</b><br>'+esc(wxTxt());
+}
+window.addEventListener('online',function(){fetchWx();updateLive();});
+window.addEventListener('offline',updateLive);
+setInterval(function(){if(P&&!document.hidden)fetchWx();},600000);
 function statusOf(row){
-  var on=num(row.onF);
-  if(!G.testOnline||on==null)return 'Off';
-  var real=num(cur().testTemp);
-  if(real==null)return 'Off';
+  var on=num(row.onF),real=realF();
+  if(on==null||real==null)return 'Off';
   return real>=on?'ON':'Off';
 }
 var tbody=$('#tbody');
@@ -1295,12 +1359,12 @@ function renderTable(){
   $('#emptyMsg').style.display=rows.length?'none':'block';
 }
 function updateLive(){
-  var on=!!G.testOnline;
+  var t=realF(),on=t!=null;
   $('#onlineBadge').classList.toggle('on',on);
   $('#onlineText').textContent=on?'অনলাইন':'অফলাইন';
-  var t=num(cur().testTemp);
-  $('#realF').value=(on&&t!=null)?r1(t):'';
-  $('#realC').value=(on&&t!=null)?r1(f2c(t)):'';
+  $('#realF').value=on?r1(t):'';
+  $('#realC').value=on?r1(f2c(t)):'';
+  $('#wxPlace').textContent=(G.testOnline&&num(cur().testTemp)!=null)?'টেস্ট মান':wxTxt();
   tbody.querySelectorAll('tr').forEach(function(tr){var row=findRow(tr.dataset.id);if(row)setPill(tr,row);});
 }
 function renderDash(){
@@ -1584,7 +1648,7 @@ function fillSettings(){
   $('#sAuto').checked=!!G.auto;$('#sNet').value=G.net;
   $('#tOnline').checked=!!G.testOnline;$('#tTemp').value=cur().testTemp||'';
   $('#tTempLabel').textContent=ghName(cur())+' — Real Temperature (°F)';
-  updateNetBox();
+  updateNetBox();updateWxBox();
 }
 function updatePath(){$('#pathHint').innerHTML='সব ডাটা ও ছবি এই ফোল্ডারের ভেতরে প্রতিটি প্রোফাইলের নামে আলাদা সাব-ফোল্ডারে জমা হবে: <b>'+esc($('#sFolder').value.trim()||'GreenHouse Log')+'/'+esc(P?P.name:'প্রোফাইল')+'</b>';}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -1760,12 +1824,26 @@ function updateNetBox(){
   var pend=(P&&D)?(sigOf()!==M.sig):false;
   box.innerHTML='🌐 ইন্টারনেট: <b>'+(navigator.onLine?'আছে':'নেই')+'</b> · নেটওয়ার্ক: <b>'+esc(type)+'</b><br>'+
     '⏳ সিঙ্কের অপেক্ষায় ডাটা: <b>'+(pend?'আছে':'নেই')+'</b><br>'+
-    '📱 অফলাইন মোড: <b>'+(('serviceWorker' in navigator&&navigator.serviceWorker.controller)?'প্রস্তুত (ডাটা এই ডিভাইসেই সেভ থাকে)':'ডাটা এই ডিভাইসে সেভ থাকে')+'</b><br>'+
+    '📱 অফলাইনে অ্যাপ খোলা: <b id="offTxt">যাচাই হচ্ছে…</b><br>'+
     '💾 স্থায়ী স্টোরেজ: <b id="persistTxt">…</b>';
+  var ot=$('#offTxt');
+  if(!('caches' in window)||!('serviceWorker' in navigator)){if(ot)ot.textContent='এই ব্রাউজারে সমর্থিত নয় (https লিংকে খুলুন)';}
+  else caches.match('./').then(function(h){var e=$('#offTxt');if(e)e.textContent=h?'প্রস্তুত ✔ (ডাটা এই ডিভাইসেই সেভ থাকে)':'এখনো প্রস্তুত নয় — একবার অনলাইনে অ্যাপ খুলে ১০ সেকেন্ড অপেক্ষা করুন';}).catch(function(){});
   if(navigator.storage&&navigator.storage.persisted)navigator.storage.persisted().then(function(p){var e=$('#persistTxt');if(e)e.textContent=p?'অনুমোদিত':'অনুমোদিত নয়';});
   else{var e=$('#persistTxt');if(e)e.textContent='সমর্থিত নয়';}
 }
 $('#tOnline').addEventListener('change',function(){G.testOnline=this.checked;gsave();updateLive();});
+$('#bWxNow').onclick=function(){setMsg('msgWx','busy','তাপমাত্রা আনা হচ্ছে…');WX.busy=false;fetchWx().then(function(){setMsg('msgWx',WX.f!=null?'ok':'err',WX.f!=null?'আপডেট হয়েছে ✔':WX.err);});};
+$('#bWxAuto').onclick=function(){delete G.manual;gsave();WX.f=null;$('#wxCity').value='';$('#bWxNow').click();};
+$('#bWxCity').onclick=function(){
+  var c=$('#wxCity').value.trim();if(!c){setMsg('msgWx','err','শহরের নাম লিখুন');return;}
+  setMsg('msgWx','busy','খোঁজা হচ্ছে…');
+  fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&name='+encodeURIComponent(c)).then(function(r){return r.json();}).then(function(j){
+    var x=j&&j.results&&j.results[0];if(!x)throw 0;
+    G.manual={lat:x.latitude,lon:x.longitude,place:[x.name,x.country].filter(Boolean).join(', ')};gsave();WX.f=null;WX.busy=false;
+    return fetchWx().then(function(){setMsg('msgWx',WX.f!=null?'ok':'err',WX.f!=null?'শহর সেট হয়েছে ✔':WX.err);});
+  }).catch(function(){setMsg('msgWx','err','শহরটি পাওয়া যায়নি');});
+};
 $('#tTemp').addEventListener('input',function(){cur().testTemp=this.value.trim();persistNow();updateLive();});
 
 /* backup */
@@ -1835,7 +1913,8 @@ function enter(p){
   loadProfile(p);G.last=p.id;gsave();
   page='dash';activeId=D.gh[0].id;
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');
-  applySb();applyApp();renderAll();startPoll();refreshChip();
+  applySb();applyApp();renderAll();startPoll();refreshChip();fetchWx();
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
   syncCycle().catch(function(){});
 }
 function logout(pre){
@@ -1948,7 +2027,9 @@ $('#lkMembers').onclick=function(e){
 loadAppImg();
 applySb();
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
-  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(function(){updateNetBox();}).catch(function(){});
+  navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.t==='updated')toast('নতুন ভার্সন এসেছে — অ্যাপ বন্ধ করে আবার খুললে চালু হবে');});
+  navigator.serviceWorker.ready.then(updateNetBox);
 }
 window.addEventListener('resize',function(){if(!isMobile())$('#app').classList.remove('sbopen');});
 showLogin();
